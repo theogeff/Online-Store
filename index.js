@@ -9,7 +9,7 @@
 
 "use strict";
 
-(function () {
+(function() {
   /**
    * Initializes the DOM once everything is fully loaded.
    */
@@ -108,6 +108,7 @@
     textarea.required = true;
     return textarea;
   }
+
   /**
    * Attaches event listeners to the popup to allow users to submit and close the form.
    * @param {HTMLElement} popup - The popup to attach the events to.
@@ -131,7 +132,6 @@
     contactForm.addEventListener('submit', function(event) {
       event.preventDefault();
       let formData = new FormData(contactForm);
-      alert(`Thank you ${formData.get('firstName')}, your message has been sent.`);
       popup.style.display = 'none';
       document.body.removeChild(popup);
     });
