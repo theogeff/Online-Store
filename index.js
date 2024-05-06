@@ -131,7 +131,6 @@
 
     contactForm.addEventListener('submit', function(event) {
       event.preventDefault();
-      let formData = new FormData(contactForm);
       popup.style.display = 'none';
       document.body.removeChild(popup);
     });
