@@ -29,7 +29,11 @@ const TWENTY_FOUR = 24;
 const ONE_THOUSAND = 1000;
 const SERVER_ERROR = 500;
 const LOGIN_ERROR = 401;
+const BAD_REQUEST = 400;
+const GOOD_CREATE = 201;
 const OK_CODE = 200;
+const OPENING_TIME = 8;
+const CLOSING_TIME = 16;
 
 
 app.use(session({
@@ -230,8 +234,8 @@ app.post('/api/order', async (req, res) => {
 
   // Check if the time is within the allowed range
   let [hours, minutes] = pickupTime.split(':').map(Number);
-  if (hours < 8 || hours > 16 || (hours === 16 && minutes > 0)) {
-    return res.status(400).json({error: 'Pickup time must be between 8:00 AM and 4:00 PM.'});
+  if (hours < OPENING_TIME || hours > CLOSING_TIME || (hours === CLOSING_TIME && minutes > 0)) {
+    return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM and 4:00 PM.'});
   }
 
   // Generate a confirmation code
@@ -335,12 +339,12 @@ app.post('/api/contact', async (req, res) => {
   let {firstName, lastName, email, message} = req.body;
 
   if (!firstName || !lastName || !email || !message) {
-    return res.status(400).json({error: 'All fields are required'});
+    return res.status(BAD_REQUEST).json({error: 'All fields are required'});
   }
 
   let emailCheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailCheck.test(email)) {
-    return res.status(400).json({error: 'Invalid email address'});
+    return res.status(BAD_REQUEST).json({error: 'Invalid email address'});
   }
 
   let submissionDate = new Date().toISOString();
@@ -349,7 +353,7 @@ app.post('/api/contact', async (req, res) => {
   try {
     await db.run(`INSERT INTO contactMessages (firstName, lastName, email, message, submissionDate)
                   VALUES (?, ?, ?, ?, ?)`, [firstName, lastName, email, message, submissionDate]);
-    res.status(201).json({message: 'Contact message saved successfully'});
+    res.status(GOOD_CREATE).json({message: 'Contact message saved successfully'});
   } catch (err) {
     console.error('Error saving contact message:', err.message);
     res.status(SERVER_ERROR).json({error: 'Failed to save contact message'});
