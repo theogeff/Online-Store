@@ -230,49 +230,33 @@ app.delete('/api/cart/:id', async (req, res) => {
 
 // Places an order.
 app.post('/api/order', async (req, res) => {
-  let userId = req.session.userId; // Get the userId from the session
-  let {pickupDate, pickupTime} = req.body;
+  const userId = req.session.userId; // Get the userId from the session
+  const {pickupTime} = req.body;
 
   // Check if the time is within the allowed range
-  let [hours, minutes] = pickupTime.split(':').map(Number);
+  const [hours, minutes] = pickupTime.split(':').map(Number);
   if (hours < OPENING_TIME || hours > CLOSING_TIME || (hours === CLOSING_TIME && minutes > 0)) {
-    return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM-4:00 PM.'});
+    return res.status(BAD_REQUEST).json({ error: 'Pickup time must be between 8:00 AM and 4:00 PM.' });
   }
 
   // Generate a confirmation code
-  let confirmationCode = crypto.randomBytes(BYTES).toString('hex');
+  const confirmationCode = crypto.randomBytes(BYTES).toString('hex');
 
-  let db = await getDBConnection();
-  let now = new Date().toISOString();
+  const db = await getDBConnection();
+  const now = new Date().toISOString();
 
-  let orderId;
   try {
-    let result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
-                  confirmationCode)
+    const result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice, confirmationCode)
                   VALUES (?, ?, ?, ?, ?)`, [userId, now, 'Pending', 0, confirmationCode]);
 
-    orderId = result.lastID;
+    const orderId = result.lastID;
 
-    let cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
-                                  FROM cart
-                                  JOIN products ON cart.productId = products.id
-                                  WHERE cart.userId = ?`, [userId]);
+    await processOrderItems(db, userId, orderId);
 
-    let totalPrice = 0;
-    for (let item of cartItems) {
-      totalPrice += item.quantity * item.price;
-      await db.run(`INSERT INTO orderItems (orderId, productId, quantity, price)
-                    VALUES (?, ?, ?, ?)`, [orderId, item.productId, item.quantity, item.price]);
-    }
-    await db.run(`UPDATE orders SET totalPrice = ? WHERE orderId = ?`, [totalPrice, orderId]);
-    await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
-
-    res.status(OK_CODE).json({message: 'Order placed successfully!', confirmationCode:
-    confirmationCode});
+    res.status(OK_CODE).json({message: 'Order placed successfully!', confirmationCode});
   } catch (err) {
-    await db.run(`DELETE FROM orderItems WHERE orderId = ?`, [orderId]);
-    await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
     console.error('Error placing order:', err.message);
+    await cleanupFailedOrder(db, orderId);
     res.status(SERVER_ERROR).json({error: 'Failed to place order'});
   }
   await db.close();
@@ -362,6 +346,23 @@ app.post('/api/contact', async (req, res) => {
   }
   await db.close();
 });
+
+// Helper Function.
+async function processOrderItems(db, userId, orderId) {
+  const cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
+                                  FROM cart
+                                  JOIN products ON cart.productId = products.id
+                                  WHERE cart.userId = ?`, [userId]);
+
+  let totalPrice = 0;
+  for (const item of cartItems) {
+    totalPrice += item.quantity * item.price;
+    await db.run(`INSERT INTO orderItems (orderId, productId, quantity, price)
+                  VALUES (?, ?, ?, ?)`, [orderId, item.productId, item.quantity, item.price]);
+  }
+  await db.run(`UPDATE orders SET totalPrice = ? WHERE orderId = ?`, [totalPrice, orderId]);
+  await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
+}
 
 // Start the server at the bottom of the file.
 const DFLT_PORT = 3000;
