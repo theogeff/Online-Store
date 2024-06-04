@@ -15,6 +15,9 @@
     searchOrder();
   }
 
+  /**
+  * Sets up event listeners for the elements on the page.
+  */
   function setEventListeners() {
     let contactBtn = id('contact-btn');
     contactBtn.addEventListener("click", createPopUp);
@@ -49,7 +52,9 @@
     gridViewBtn.addEventListener('click', () => toggleView('grid'));
     listViewBtn.addEventListener('click', () => toggleView('list'));
   }
-
+  /**
+  * Sets up search and ordering functionalities by setting up event listeners.
+  */
   function searchOrder() {
     let searchIcon = id('search-icon');
     if (searchIcon) {
@@ -176,7 +181,10 @@
       newForm.removeEventListener('submit', handler);
     });
   }
-
+  /**
+  * Fetches product details for a given product ID.
+  * @param {number} productId - The ID of the product.
+  */
   function fetchProductDetails(productId) {
     fetch(`/api/product/${productId}`)
       .then(response => response.json())
@@ -190,7 +198,9 @@
       })
       .catch(error => console.error('Error fetching product details:', error));
   }
-
+  /**
+   * Closes the quantity popup.
+   */
   function closeQuantityPopup() {
     let popup = document.getElementById('quantity-popup');
     popup.style.display = 'none';
@@ -226,12 +236,14 @@
         }
         return response.json();
       })
-      .then(data => {
-        updateCartDisplay();
-      })
+      .then(updateCartDisplay())
       .catch(error => console.error('Error adding to cart:', error));
   }
 
+  /**
+   * Handles the submission of search forms.
+   * @param {Event} event - The event object.
+   */
   function handleSearch(event) {
     event.preventDefault();
     let searchTerm = document.getElementById('search-input').value;
@@ -239,6 +251,9 @@
     closePopup('search-popup');
   }
 
+  /**
+   * Handles the click on the account icon.
+   */
   function handleAccountIconClick() {
     fetch('/api/login-status')
       .then(response => response.json())
@@ -258,6 +273,9 @@
       .catch(error => console.error('Error checking login status:', error));
   }
 
+  /**
+   * Handles a signed in user signing out.
+   */
   function handleSignOut() {
     fetch('/api/logout', {
       method: 'POST',
@@ -271,14 +289,16 @@
         }
         return response.json();
       })
-      .then(data => {
-        showAlert('You have been signed out.');
-        closePopup('account-popup-logged-in');
-        window.location.reload();
-      })
+      .then(
+        showAlert('You have been signed out.'))
+      .then(closePopup('account-popup-logged-in'))
+      .then(window.location.reload())
       .catch(error => console.error('Error logging out:', error));
   }
 
+  /**
+   * Fetches the order history for the user.
+   */
   function fetchOrderHistory() {
     fetch('/api/order-history')
       .then(response => response.json())
@@ -290,6 +310,10 @@
       .catch(error => console.error('Error fetching order history:', error));
   }
 
+  /**
+   * Displays the order history on the page.
+   * @param {Array} data - The array of order history objects.
+   */
   function renderOrderHistory(data) {
     let orderHistoryList = document.getElementById('order-history-list');
     orderHistoryList.innerHTML = '';
@@ -306,6 +330,11 @@
     }
   }
 
+  /**
+  * Creates an order element.
+   * @param {Object} order - The order object.
+  * @returns {HTMLElement} - The created order element.
+  */
   function createOrderElement(order) {
     let orderElement = document.createElement('div');
     orderElement.classList.add('order');
@@ -333,6 +362,10 @@
     openPopup('register-popup');
   });
 
+  /**
+   * Handles the submission of a login event.
+   * @param {Event} event - The event object.
+   */
   function handleLogin(event) {
     event.preventDefault();
     let username = document.getElementById('username').value;
@@ -362,6 +395,10 @@
       .catch(error => handleLoginError(error));
   }
 
+  /**
+  * Handles login errors.
+  * @param {Error} error - The error object.
+  */
   function handleLoginError(error) {
     if (error.message.includes('Username not found')) {
       showAlert('Username not found. Try creating an account.');
@@ -373,6 +410,10 @@
     }
   }
 
+  /**
+  * Handles the submission of a registration form.
+  * @param {Event} event - The event object.
+  */
   function handleRegister(event) {
     event.preventDefault();
     let username = document.getElementById('new-username').value;
@@ -398,6 +439,9 @@
       .catch(error => console.error('Error registering:', error));
   }
 
+  /**
+   * Updates the items displayed in the cart.
+   */
   function updateCartDisplay() {
     fetch('/api/cart')
       .then(response => response.json())
@@ -408,6 +452,10 @@
       .catch(error => console.error("Error fetching cart items", error));
   }
 
+  /**
+  * Displays the cart items on the page.
+  * @param {Array} cartItems - The array of cart item objects.
+  */
   function renderCartItems(cartItems) {
     let cartItemsList = document.getElementById("cart-items");
     cartItemsList.innerHTML = ""; // Clear existing cart items
@@ -424,20 +472,25 @@
     }
   }
 
+  /**
+  * Creates a cart item element.
+  * @param {Object} item - The cart item object.
+  * @returns {HTMLElement} - The created cart item element.
+  */
   function createCartItemElement(item) {
     let itemElement = document.createElement("li");
 
     let minusButton = document.createElement("button");
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
-    minusButton.addEventListener('click', () => updateCartItemQuantity
-    (item.cartItemId, item.quantity - 1));
+    minusButton.addEventListener('click', () =>
+      updateCartItemQuantity(item.cartItemId, item.quantity - 1));
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
-    plusButton.addEventListener('click', () => updateCartItemQuantity
-    (item.cartItemId, item.quantity + 1));
+    plusButton.addEventListener('click', () =>
+      updateCartItemQuantity(item.cartItemId, item.quantity + 1));
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
@@ -450,6 +503,9 @@
     return itemElement;
   }
 
+  /**
+   * Clears all items inside the cart.
+   */
   function clearCart() {
     fetch('/api/cart', {
       method: 'DELETE'
@@ -462,6 +518,10 @@
       .catch(error => console.error("Error clearing cart", error));
   }
 
+  /**
+   * Displays the empty cart messsage.
+   * @param {T=string} message - The empty cart message.
+   */
   function renderEmptyCart(message) {
     let cartItemsList = document.getElementById("cart-items");
     cartItemsList.innerHTML = ""; // Clear existing cart items
@@ -470,6 +530,11 @@
     cartItemsList.appendChild(emptyMessage);
   }
 
+  /**
+  * Updates the quantity of a cart item.
+  * @param {number} cartItemId - The ID of the cart item.
+  * @param {number} newQuantity - The new quantity of the cart item.
+  */
   function updateCartItemQuantity(cartItemId, newQuantity) {
     if (newQuantity >= 1) {
       fetch(`/api/cart/${cartItemId}`, {
@@ -482,26 +547,27 @@
         })
       })
         .then(response => response.json())
-        .then(data => {
-          updateCartDisplay();
-        })
+        .then(updateCartDisplay())
         .catch(error => console.error('Error updating cart item quantity:', error));
     } else {
       removeCartItem(cartItemId);
     }
   }
-
+  /**
+  * Removes a cart item.
+  * @param {number} cartItemId - The ID of the cart item to be removed.
+  */
   function removeCartItem(cartItemId) {
     fetch(`/api/cart/${cartItemId}`, {
       method: 'DELETE'
     })
       .then(response => response.json())
-      .then(data => {
-        updateCartDisplay();
-      })
+      .then(updateCartDisplay())
       .catch(error => console.error('Error removing cart item:', error));
   }
-
+  /**
+   * Updates the state (enabled or disables) of the make order button based on the cart contents.
+   */
   function updateMakeOrderButton() {
     fetch('/api/cart')
       .then(response => response.json())
@@ -512,20 +578,30 @@
       .catch(error => console.error("Error fetching cart items", error));
   }
 
+  /**
+   * Opens the order popup.
+   */
   function openOrderPopup() {
     let popup = document.getElementById('order-popup');
     popup.style.display = 'block';
 
     let orderForm = document.getElementById('order-form');
-    orderForm.removeEventListener('submit', handleOrderFormSubmit); // Remove any existing event listener
+    orderForm.removeEventListener('submit', handleOrderFormSubmit);
     orderForm.addEventListener('submit', handleOrderFormSubmit);
   }
 
+  /**
+   * Handles the submission of an order form.
+   * @param {Event} event - The event object.
+   */
   function handleOrderFormSubmit(event) {
     event.preventDefault();
     handleMakeOrder();
   }
 
+  /**
+   * Handles making an order.
+   */
   function handleMakeOrder() {
     let pickupDate = document.getElementById('pickup-date').value;
     let pickupTime = document.getElementById('pickup-time').value;
@@ -558,6 +634,9 @@
       });
   }
 
+  /**
+   * Creates a contact popup.
+   */
   function createPopUp() {
     let popup = document.createElement('div');
     popup.id = 'contactPopup';
@@ -599,13 +678,24 @@
     attachPopupEvents(popup);
   }
 
+  /**
+  * Creates a form label element.
+  * @param {string} forAttribute - The value for the 'for' attribute of the label.
+  * @param {string} text - The text content of the label.
+  * @returns {HTMLElement} - The created label element.
+  */
   function createFormLabel(forAttribute, text) {
     let label = document.createElement('label');
     label.htmlFor = forAttribute;
     label.textContent = text;
     return label;
   }
-
+  /**
+  * Creates a form input element.
+  * @param {string} id - The ID of the input element.
+  * @param {string} type - The type of the input element.
+  * @returns {HTMLElement} - The created input element.
+  */
   function createFormInput(id, type) {
     let input = document.createElement('input');
     input.type = type;
@@ -614,7 +704,11 @@
     input.required = true;
     return input;
   }
-
+  /**
+  * Creates a form textarea element.
+  * @param {string} id - The ID of the textarea element.
+  * @returns {HTMLElement} - The created textarea element.
+  */
   function createFormTextarea(id) {
     let textarea = document.createElement('textarea');
     textarea.id = id;
@@ -622,7 +716,10 @@
     textarea.required = true;
     return textarea;
   }
-
+  /**
+  * Attaches events to a popup element.
+  * @param {HTMLElement} popup - The popup element.
+  */
   function attachPopupEvents(popup) {
     let closeBtn = popup.querySelector('.close');
     let contactForm = popup.querySelector('#contactForm');
@@ -639,7 +736,7 @@
       }
     });
 
-    contactForm.addEventListener('submit', function (event) {
+    contactForm.addEventListener('submit', function(event) {
       event.preventDefault();
 
       let formData = {
@@ -674,25 +771,39 @@
         });
     });
   }
-
+  /**
+  * Opens a popup by its ID.
+  * @param {string} popupId - The ID of the popup to open.
+  */
   function openPopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
       popup.style.display = 'block';
     }
   }
-
+  /**
+  * Closes a popup by its ID.
+  * @param {string} popupId - The ID of the popup to close.
+  */
   function closePopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
       popup.style.display = 'none';
     }
   }
-
+  /**
+   * Gets an element by its ID.
+   * @param {string} name - The ID of the element to get.
+   * @returns {HTMLElement} - The element with the specified ID.
+   */
   function id(name) {
     return document.getElementById(name);
   }
 
+  /**
+   * Toggles the view between grid and list.
+   * @param {string} view - The view type ('grid' or 'list').
+   */
   function toggleView(view) {
     let shopContent = document.getElementById('shop-content');
     if (view === 'grid') {
@@ -704,10 +815,16 @@
     }
   }
 
+  /**
+   * Displays an alert with a given message.
+   * @param {string} message - The message to display in the alert.
+   */
   function showAlert(message) {
     alert(message); // For simplicity, using alert. Replace with better feedback mechanism.
   }
-
+  /**
+   * Initializes popups by setting up event listeners.
+   */
   function initializePopups() {
     let popups = document.querySelectorAll('.popup');
     popups.forEach(popup => {
