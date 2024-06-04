@@ -244,13 +244,13 @@ app.post('/api/order', async (req, res) => {
 
   let db = await getDBConnection();
   let now = new Date().toISOString();
-
+  let orderId;
   try {
     let result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
                   confirmationCode)
                   VALUES (?, ?, ?, ?, ?)`, [userId, now, 'Pending', 0, confirmationCode]);
 
-    let orderId = result.lastID;
+    orderId = result.lastID;
 
     await processOrderItems(db, userId, orderId);
 
