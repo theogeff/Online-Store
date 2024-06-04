@@ -731,81 +731,81 @@
   }
 
   /**
- * Attaches events to a popup element.
- * @param {HTMLElement} popup - The popup element.
- */
-function attachPopupEvents(popup) {
-  attachPopupCloseEvent(popup);
-  attachPopupWindowEvent(popup);
-  attachPopupFormEvent(popup);
-}
+   * Attaches events to a popup element.
+   * @param {HTMLElement} popup - The popup element.
+   */
+  function attachPopupEvents(popup) {
+    attachPopupCloseEvent(popup);
+    attachPopupWindowEvent(popup);
+    attachPopupFormEvent(popup);
+  }
 
-/**
- * Attaches the close event to a popup element.
- * @param {HTMLElement} popup - The popup element.
- */
-function attachPopupCloseEvent(popup) {
-  let closeBtn = popup.querySelector('.close');
-  closeBtn.addEventListener('click', function() {
-    popup.style.display = 'none';
-    document.body.removeChild(popup);
-  });
-}
-
-/**
- * Attaches the window click event to a popup element.
- * @param {HTMLElement} popup - The popup element.
- */
-function attachPopupWindowEvent(popup) {
-  window.addEventListener('click', function(event) {
-    if (event.target === popup) {
+  /**
+   * Attaches the close event to a popup element.
+   * @param {HTMLElement} popup - The popup element.
+   */
+  function attachPopupCloseEvent(popup) {
+    let closeBtn = popup.querySelector('.close');
+    closeBtn.addEventListener('click', function() {
       popup.style.display = 'none';
       document.body.removeChild(popup);
-    }
-  });
-}
+    });
+  }
 
-/**
- * Attaches the form submit event to a popup element.
- * @param {HTMLElement} popup - The popup element.
- */
-function attachPopupFormEvent(popup) {
-  let contactForm = popup.querySelector('#contactForm');
-  contactForm.addEventListener('submit', function(event) {
-    event.preventDefault();
+  /**
+   * Attaches the window click event to a popup element.
+   * @param {HTMLElement} popup - The popup element.
+   */
+  function attachPopupWindowEvent(popup) {
+    window.addEventListener('click', function(event) {
+      if (event.target === popup) {
+        popup.style.display = 'none';
+        document.body.removeChild(popup);
+      }
+    });
+  }
 
-    let formData = {
-      firstName: document.getElementById('firstName').value,
-      lastName: document.getElementById('lastName').value,
-      email: document.getElementById('email').value,
-      message: document.getElementById('message').value
-    };
+  /**
+   * Attaches the form submit event to a popup element.
+   * @param {HTMLElement} popup - The popup element.
+   */
+  function attachPopupFormEvent(popup) {
+    let contactForm = popup.querySelector('#contactForm');
+    contactForm.addEventListener('submit', function(event) {
+      event.preventDefault();
 
-    fetch('/api/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.errors) {
-          data.errors.forEach(error => {
-            showAlert(error.msg);
-          });
-        } else {
-          showAlert('Your message has been sent successfully!');
-          popup.style.display = 'none';
-          document.body.removeChild(popup);
-        }
+      let formData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value
+      };
+
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
-      .catch(error => {
-        console.error('Error submitting contact form:', error);
-        showAlert('An error occurred while submitting your message. Please try again later.');
-      });
-  });
-}
+        .then(response => response.json())
+        .then(data => {
+          if (data.errors) {
+            data.errors.forEach(error => {
+              showAlert(error.msg);
+            });
+          } else {
+            showAlert('Your message has been sent successfully!');
+            popup.style.display = 'none';
+            document.body.removeChild(popup);
+          }
+        })
+        .catch(error => {
+          console.error('Error submitting contact form:', error);
+          showAlert('An error occurred while submitting your message. Please try again later.');
+        });
+    });
+  }
 
   /**
    * Opens a popup by its ID.
