@@ -527,7 +527,6 @@ form {
   padding-bottom: 25px;
 }
 
-
 .list-view .shop-category ul {
   display: flex;
   flex-direction: column;
@@ -559,11 +558,31 @@ form {
   font-weight: 400;
 }
 
-#list-view-btn, #grid-view-btn {
+.view-toggle {
   display: flex;
   justify-content: center;
   margin-top: 20px;
-  margin-left: 30px;
+}
+
+.view-toggle li {
+  list-style: none;
+  margin: 0 10px;
+}
+
+#grid-view-btn, #list-view-btn {
+  background-color: #c69c78;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+#grid-view-btn:hover, #list-view-btn:hover {
+  opacity: 0.8;
 }
 
 #sign-out-btn {
