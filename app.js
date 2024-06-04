@@ -236,7 +236,7 @@ app.post('/api/order', async (req, res) => {
   // Check if the time is within the allowed range
   const [hours, minutes] = pickupTime.split(':').map(Number);
   if (hours < OPENING_TIME || hours > CLOSING_TIME || (hours === CLOSING_TIME && minutes > 0)) {
-    return res.status(BAD_REQUEST).json({ error: 'Pickup time must be between 8:00 AM and 4:00 PM.' });
+    return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM-4:00 PM.'});
   }
 
   // Generate a confirmation code
@@ -246,7 +246,8 @@ app.post('/api/order', async (req, res) => {
   const now = new Date().toISOString();
 
   try {
-    const result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice, confirmationCode)
+    const result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
+                  confirmationCode)
                   VALUES (?, ?, ?, ?, ?)`, [userId, now, 'Pending', 0, confirmationCode]);
 
     const orderId = result.lastID;
@@ -347,7 +348,7 @@ app.post('/api/contact', async (req, res) => {
   await db.close();
 });
 
-// Helper Function.
+// Helper Functions
 async function processOrderItems(db, userId, orderId) {
   const cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
                                   FROM cart
@@ -362,6 +363,11 @@ async function processOrderItems(db, userId, orderId) {
   }
   await db.run(`UPDATE orders SET totalPrice = ? WHERE orderId = ?`, [totalPrice, orderId]);
   await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
+}
+
+async function cleanupFailedOrder(db, orderId) {
+  await db.run(`DELETE FROM orderItems WHERE orderId = ?`, [orderId]);
+  await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
 }
 
 // Start the server at the bottom of the file.
