@@ -1,5 +1,6 @@
 # *Theo Gefflaut * API Documentation
-*Fill in a short description here about the API's purpose.*
+*This API allows all functionality for the store. Endpoints for logging in, making orders adding
+items to the cart, writing a contact form are defined by it.*
 
 ## *User Registration*
 **Request Format:** */api/register*

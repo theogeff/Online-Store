@@ -1,3 +1,14 @@
+/**
+ * Theo Gefflaut
+ * May 12th, 2024
+ * Section AB  Elias Belzberg and Quinton Pharr
+ *
+ * This JavaScript handles the client side interactions for all client interactions with the
+ * webpage. Most of the features pertain to the shop page and allow  product display, cart
+ * management, order placement, and user authentication. It uses multiple popups on the page to
+ * facilitate these tasks.
+ */
+
 "use strict";
 
 (function() {
