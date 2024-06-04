@@ -731,60 +731,81 @@
   }
 
   /**
-   * Attaches events to a popup element.
-   * @param {HTMLElement} popup - The popup element.
-   */
-  function attachPopupEvents(popup) {
-    let closeBtn = popup.querySelector('.close');
-    let contactForm = popup.querySelector('#contactForm');
+ * Attaches events to a popup element.
+ * @param {HTMLElement} popup - The popup element.
+ */
+function attachPopupEvents(popup) {
+  attachPopupCloseEvent(popup);
+  attachPopupWindowEvent(popup);
+  attachPopupFormEvent(popup);
+}
 
-    closeBtn.addEventListener('click', function() {
+/**
+ * Attaches the close event to a popup element.
+ * @param {HTMLElement} popup - The popup element.
+ */
+function attachPopupCloseEvent(popup) {
+  let closeBtn = popup.querySelector('.close');
+  closeBtn.addEventListener('click', function() {
+    popup.style.display = 'none';
+    document.body.removeChild(popup);
+  });
+}
+
+/**
+ * Attaches the window click event to a popup element.
+ * @param {HTMLElement} popup - The popup element.
+ */
+function attachPopupWindowEvent(popup) {
+  window.addEventListener('click', function(event) {
+    if (event.target === popup) {
       popup.style.display = 'none';
       document.body.removeChild(popup);
-    });
+    }
+  });
+}
 
-    window.addEventListener('click', function(event) {
-      if (event.target === popup) {
-        popup.style.display = 'none';
-        document.body.removeChild(popup);
-      }
-    });
+/**
+ * Attaches the form submit event to a popup element.
+ * @param {HTMLElement} popup - The popup element.
+ */
+function attachPopupFormEvent(popup) {
+  let contactForm = popup.querySelector('#contactForm');
+  contactForm.addEventListener('submit', function(event) {
+    event.preventDefault();
 
-    contactForm.addEventListener('submit', function(event) {
-      event.preventDefault();
+    let formData = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      email: document.getElementById('email').value,
+      message: document.getElementById('message').value
+    };
 
-      let formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        message: document.getElementById('message').value
-      };
-
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.errors) {
+          data.errors.forEach(error => {
+            showAlert(error.msg);
+          });
+        } else {
+          showAlert('Your message has been sent successfully!');
+          popup.style.display = 'none';
+          document.body.removeChild(popup);
+        }
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.errors) {
-            data.errors.forEach(error => {
-              showAlert(error.msg);
-            });
-          } else {
-            showAlert('Your message has been sent successfully!');
-            popup.style.display = 'none';
-            document.body.removeChild(popup);
-          }
-        })
-        .catch(error => {
-          console.error('Error submitting contact form:', error);
-          showAlert('An error occurred while submitting your message. Please try again later.');
-        });
-    });
-  }
+      .catch(error => {
+        console.error('Error submitting contact form:', error);
+        showAlert('An error occurred while submitting your message. Please try again later.');
+      });
+  });
+}
 
   /**
    * Opens a popup by its ID.
@@ -837,7 +858,15 @@
    * @param {string} message - The message to display in the alert.
    */
   function showAlert(message) {
-    alert(message); // For simplicity, using alert. Replace with better feedback mechanism.
+    let alertContainer = document.createElement('div');
+    alertContainer.className = 'custom-alert';
+    alertContainer.textContent = message;
+
+    document.body.appendChild(alertContainer);
+
+    setTimeout(() => {
+      alertContainer.remove();
+    }, 3000); // Adjust the timeout as needed
   }
 
   /**
