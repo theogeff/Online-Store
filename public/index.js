@@ -16,8 +16,8 @@
   }
 
   /**
-  * Sets up event listeners for the elements on the page.
-  */
+   * Sets up event listeners for the elements on the page.
+   */
   function setEventListeners() {
     let contactBtn = id('contact-btn');
     contactBtn.addEventListener("click", createPopUp);
@@ -53,8 +53,8 @@
     listViewBtn.addEventListener('click', () => toggleView('list'));
   }
   /**
-  * Sets up search and ordering functionalities by setting up event listeners.
-  */
+   * Sets up search and ordering functionalities by setting up event listeners.
+   */
   function searchOrder() {
     let searchIcon = id('search-icon');
     if (searchIcon) {
@@ -136,6 +136,11 @@
     shopContent.appendChild(categorySection);
   }
 
+  /**
+   * Creates a product item element.
+   * @param {Object} item - The product item object.
+   * @returns {HTMLElement} - The created product item element.
+  */
   function createProductItemElement(item) {
     let itemImage = document.createElement('img');
     itemImage.src = item.imgUrl;
