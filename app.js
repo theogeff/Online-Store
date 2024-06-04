@@ -34,6 +34,7 @@ const GOOD_CREATE = 201;
 const OK_CODE = 200;
 const OPENING_TIME = 8;
 const CLOSING_TIME = 16;
+const BYTES = 4;
 
 app.use(session({
   secret: 'your_secret_key',
@@ -239,7 +240,7 @@ app.post('/api/order', async (req, res) => {
   }
 
   // Generate a confirmation code
-  let confirmationCode = crypto.randomBytes(4).toString('hex');
+  let confirmationCode = crypto.randomBytes(BYTES).toString('hex');
 
   let db = await getDBConnection();
   let now = new Date().toISOString();
@@ -266,9 +267,9 @@ app.post('/api/order', async (req, res) => {
     await db.run(`UPDATE orders SET totalPrice = ? WHERE orderId = ?`, [totalPrice, orderId]);
     await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
 
-    res.status(OK_CODE).json({message: 'Order placed successfully!', confirmationCode: confirmationCode});
+    res.status(OK_CODE).json({message: 'Order placed successfully!', confirmationCode:
+    confirmationCode});
   } catch (err) {
-    console.log(orderId);
     await db.run(`DELETE FROM orderItems WHERE orderId = ?`, [orderId]);
     await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
     console.error('Error placing order:', err.message);
