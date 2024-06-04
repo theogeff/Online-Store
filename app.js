@@ -234,7 +234,7 @@ app.post('/api/order', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
 
   if (!userId) {
-    return res.status(401).json({ error: 'User not logged in' });
+    return res.status(LOGIN_ERROR).json({error: 'User not logged in'});
   }
 
   let {pickupTime} = req.body;
@@ -284,7 +284,7 @@ app.get('/api/search', async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error('Error searching products:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
