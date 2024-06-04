@@ -527,13 +527,13 @@ form {
   padding-bottom: 25px;
 }
 
-.view-toggle {
+#view-toggle {
   display: flex;
   justify-content: center;
   margin: 20px 0;
 }
 
-.view-toggle button {
+#view-toggle button {
   margin: -10px 10px;
   padding: 10px 20px;
   font-size: 16px;
