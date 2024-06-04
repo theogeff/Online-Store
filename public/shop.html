@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="shop-styles.css">
+    <script src="index.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="imgs/logo-removebg-preview.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&display=swap"
+      rel="stylesheet">
+    <title>L'Expérience Paris | Shop</title>
+  </head>
+
+  <body>
+    <header>
+      <img src="imgs/logo-blue.png" alt="logo" id="logo">
+      <nav class="stroke">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="menu.html">Menu</a></li>
+          <li><a href="shop.html">Shop</a></li>
+          <li><button id="contact-btn">Contact Us</button></li>
+          <li><img src="imgs/searchicon.png" alt="search icon" class="icons" id="search-icon"></li>
+          <li><img src="imgs/account.png" alt="account icon" class="icons" id="account-icon"></li>
+          <li><img src="imgs/cart.png" alt="cart icon" class="cart" id="cart-icon"></li>
+        </ul>
+      </nav>
+    </header>
+
+    <nav class="shop-nav">
+      <ul id="shop-nav-list">
+        <li><a href="#" data-category="Breakfast">Breakfast</a></li>
+        <li><a href="#" data-category="Lunch">Lunch</a></li>
+        <li><a href="#" data-category="Brunch">Brunch</a></li>
+        <li><a href="#" data-category="Viennoiseries">Viennoiseries</a></li>
+        <li><a href="#" data-category="Coffee">Coffee</a></li>
+        <li><a href="#" data-category="Patisserie">Patisserie</a></li>
+        <li><a href="#" data-category="Made-to-order Desserts">Made-to-order Desserts</a></li>
+        <li><a href="#" data-category="Bread">Bread</a></li>
+        <li><a href="#" data-category="Catering and Events">Catering and Events</a></li>
+      </ul>
+    </nav>
+
+    <div class="view-toggle">
+      <li><button id="grid-view-btn">Grid View</button></li>
+      <li><button id="list-view-btn">List View</button></li>
+    </div>
+
+    <div id="search-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <form id="search-form">
+          <label for="search-input">Search</label>
+          <input type="text" id="search-input" name="search-input" required>
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-results">
+          <!-- Search results will be dynamically populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Popup -->
+    <div id="account-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Login</h2>
+        <form id="login-form">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+          <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="#" id="create-account-link">Create Account</a></p>
+      </div>
+    </div>
+
+    <!-- Registration Popup -->
+    <div id="register-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Create Account</h2>
+        <form id="register-form">
+          <label for="new-username">Username</label>
+          <input type="text" id="new-username" name="username" required>
+          <label for="new-email">Email</label>
+          <input type="email" id="new-email" name="email" required>
+          <label for="new-password">Password</label>
+          <input type="password" id="new-password" name="password" required>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Cart Popup -->
+    <div id="cart-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2 class="cart-header">Your Cart</h2>
+        <ul id="cart-items">
+          <!-- Cart items will be dynamically populated here -->
+        </ul>
+        <div id="clear-cart-container">
+          <button id="clear-cart-btn">Clear Cart</button>
+          <button id="make-order-btn">Make Order</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantity Popup -->
+    <div id="quantity-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2 id="popup-product-name"></h2>
+        <img id="popup-product-img" src="" alt=" selected product" class="popup-img">
+        <p id="popup-product-price"></p>
+        <p id="popup-product-availability"></p>
+        <form id="quantity-form">
+          <div class="quantity-selection">
+            <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+          </div>
+          <button type="submit" class="update-btn">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Order Popup -->
+    <div id="order-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Order Details</h2>
+        <ul id="order-items">
+          <!-- Order items will be dynamically populated here -->
+        </ul>
+        <p id="order-total-price"></p>
+        <form id="order-form">
+          <label for="pickup-date">Pickup Date</label>
+          <input type="date" id="pickup-date" name="pickup-date" required>
+          <label for="pickup-time">Pickup Time</label>
+          <input type="time" id="pickup-time" name="pickup-time" required>
+          <button type="submit">Confirm Order</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Account Popup when logged in -->
+    <div id="account-popup-logged-in" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Account</h2>
+        <p id="account-welcome"></p>
+        <a href="#" id="order-history-link">View Order History</a>
+        <button id="sign-out-btn">Sign Out</button> <!-- Sign Out Button -->
+      </div>
+    </div>
+
+    <!-- Order history popup -->
+    <div id="order-history-popup" class="popup">
+      <div class="popup-content">
+        <span class="close">&times;</span>
+        <h2>Order History</h2>
+        <div id="order-history-list"></div>
+      </div>
+    </div>
+
+    <main id="shop-content">
+      <!-- Product categories and items will be dynamically populated here -->
+    </main>
+  </body>
+</html>
