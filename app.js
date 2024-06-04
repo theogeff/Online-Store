@@ -24,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+const DFLT_PORT = 3000;
 const SIXTY = 60;
 const TWENTY_FOUR = 24;
 const ONE_THOUSAND = 1000;
@@ -384,6 +385,6 @@ async function cleanupFailedOrder(db, orderId) {
 }
 
 // Start the server at the bottom of the file.
-const DFLT_PORT = 3000;
+app.use(express.static('public'));
 const PORT = process.env.PORT || DFLT_PORT;
 app.listen(PORT);
