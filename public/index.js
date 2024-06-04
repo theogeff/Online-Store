@@ -1,6 +1,6 @@
 "use strict";
 
-(function() {
+(function () {
   window.addEventListener("load", init);
 
   /**
@@ -8,27 +8,13 @@
    */
   function init() {
     checkLoginStatus();
+    setEventListeners();
+    initializePopups();
+  }
+
+  function setEventListeners() {
     let contactBtn = id('contact-btn');
     contactBtn.addEventListener("click", createPopUp);
-    /**
-     * Verifies the login status of the user.
-     */
-    function checkLoginStatus() {
-      fetch('/api/login-status')
-        .then(response => response.json())
-        .then(data => {
-          if (data.loggedIn) {
-            document.getElementById('account-welcome').textContent = `Welcome, ${data.username}!`;
-            document.getElementById('order-history-link').addEventListener('click', (event) => {
-              event.preventDefault();
-              fetchOrderHistory();
-            });
-            document.getElementById('sign-out-btn').addEventListener('click', handleSignOut);
-            openPopup('account-popup-logged-in');
-          }
-        })
-        .catch(error => console.error('Error checking login status:', error));
-    }
 
     let logo = document.getElementById('logo');
     if (logo) {
@@ -75,39 +61,30 @@
     let listViewBtn = id('list-view-btn');
     gridViewBtn.addEventListener('click', () => toggleView('grid'));
     listViewBtn.addEventListener('click', () => toggleView('list'));
-
-    // Initialize popups
-    let popups = document.querySelectorAll('.popup');
-    popups.forEach(popup => {
-      let closeBtn = popup.querySelector('.close');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          popup.style.display = 'none';
-        });
-      }
-
-      window.addEventListener('click', (event) => {
-        if (event.target === popup) {
-          popup.style.display = 'none';
-        }
-      });
-    });
-
-    let shopNavList = document.getElementById('shop-nav-list');
-    if (shopNavList) {
-      // Initially loads all products under the viennoiserie section when the store is entered.
-      fetchAndRenderProducts('/api/products/Viennoiseries', 'Viennoiseries');
-
-      shopNavList.addEventListener('click', (event) => {
-        event.preventDefault();
-        let category = event.target.getAttribute('data-category');
-        fetchAndRenderProducts(`/api/products/${category}`, category);
-      });
-    }
   }
 
   /**
-   * Fetches and render in products from the given url.
+   * Verifies the login status of the user.
+   */
+  function checkLoginStatus() {
+    fetch('/api/login-status')
+      .then(response => response.json())
+      .then(data => {
+        if (data.loggedIn) {
+          document.getElementById('account-welcome').textContent = `Welcome, ${data.username}!`;
+          document.getElementById('order-history-link').addEventListener('click', (event) => {
+            event.preventDefault();
+            fetchOrderHistory();
+          });
+          document.getElementById('sign-out-btn').addEventListener('click', handleSignOut);
+          openPopup('account-popup-logged-in');
+        }
+      })
+      .catch(error => console.error('Error checking login status:', error));
+  }
+
+  /**
+   * Fetches and renders products from the given url.
    * @param {string} url - The URL to fetch products from.
    * @param {string} title - The name of the product category.
    */
@@ -122,7 +99,7 @@
 
   /**
    * Displays products on the page.
-   * @param {string} data - The set of product object to display.
+   * @param {Array} data - The set of product objects to display.
    * @param {string} title - The name of the product category.
    */
   function renderProducts(data, title) {
@@ -141,58 +118,48 @@
     data.forEach(item => {
       if (!uniqueProductIds.has(item.id)) {
         uniqueProductIds.add(item.id);
-        console.log('Rendering product:', item); // Add log to check product details
-        let itemImage = document.createElement('img');
-        itemImage.src = item.imgUrl;
-        itemImage.alt = item.name;
-        itemImage.classList.add('product-image');
-        let itemDescription = document.createElement('p');
-        itemDescription.textContent = `${item.name} - $${item.price}`;
-        let itemElement = document.createElement('li');
-        itemElement.dataset.productId = item.id; // Ensure product ID is set
-        itemElement.appendChild(itemImage);
-        itemElement.appendChild(itemDescription);
-        itemElement.addEventListener('click', () => openQuantityPopup(item.id)); // Ensure correct ID is passed
+        let itemElement = createProductItemElement(item);
         itemList.appendChild(itemElement);
       }
     });
     categorySection.appendChild(itemList);
-
     shopContent.appendChild(categorySection);
   }
 
+  function createProductItemElement(item) {
+    let itemImage = document.createElement('img');
+    itemImage.src = item.imgUrl;
+    itemImage.alt = item.name;
+    itemImage.classList.add('product-image');
+
+    let itemDescription = document.createElement('p');
+    itemDescription.textContent = `${item.name} - $${item.price}`;
+
+    let itemElement = document.createElement('li');
+    itemElement.dataset.productId = item.id;
+    itemElement.appendChild(itemImage);
+    itemElement.appendChild(itemDescription);
+    itemElement.addEventListener('click', () => openQuantityPopup(item.id));
+
+    return itemElement;
+  }
 
   /**
-   * Opens the popup allowing users to chose a quantity and add to cart.
+   * Opens the popup allowing users to choose a quantity and add to cart.
    * @param {number} productId - The ID of the clicked product.
    */
   function openQuantityPopup(productId) {
-
     let popup = document.getElementById('quantity-popup');
     let quantityForm = document.getElementById('quantity-form');
-    console.log('Opening quantity popup for product ID:', productId);
 
-    quantityForm.dataset.productId = productId; // Store product ID in form
+    quantityForm.dataset.productId = productId;
 
     // Remove previous event listeners to avoid duplicates
     let newForm = quantityForm.cloneNode(true);
     quantityForm.parentNode.replaceChild(newForm, quantityForm);
+    newForm.dataset.productId = productId;
 
-    newForm.dataset.productId = productId; // Restore product ID
-
-    // Fetch product details
-    fetch(`/api/product/${productId}`)
-      .then(response => response.json())
-      .then(data => {
-        console.log('Fetched product details:', data);
-        // Update the popup content with product details
-        document.getElementById('popup-product-name').textContent = data.name;
-        document.getElementById('popup-product-img').src = data.imgUrl;
-        document.getElementById('popup-product-price').textContent = `Price: $${data.price}`;
-        document.getElementById('popup-product-availability').textContent = `Availability: ${data.availability}`;
-        document.getElementById('quantity').value = 1; // Reset quantity to 1
-      })
-      .catch(error => console.error('Error fetching product details:', error));
+    fetchProductDetails(productId);
 
     popup.style.display = 'block';
 
@@ -205,10 +172,19 @@
     });
   }
 
+  function fetchProductDetails(productId) {
+    fetch(`/api/product/${productId}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('popup-product-name').textContent = data.name;
+        document.getElementById('popup-product-img').src = data.imgUrl;
+        document.getElementById('popup-product-price').textContent = `Price: $${data.price}`;
+        document.getElementById('popup-product-availability').textContent = `Availability: ${data.availability}`;
+        document.getElementById('quantity').value = 1; // Reset quantity to 1
+      })
+      .catch(error => console.error('Error fetching product details:', error));
+  }
 
-  /**
-   * Closes the quantity popup.
-   */
   function closeQuantityPopup() {
     let popup = document.getElementById('quantity-popup');
     popup.style.display = 'none';
@@ -235,8 +211,8 @@
       })
     })
       .then(response => {
-        if (response.status === 401) {
-          alert('You need to be logged in to add items to the cart.');
+        if (response.status === UNAUTHORIZED) {
+          showAlert('You need to be logged in to add items to the cart.');
           throw new Error('User not logged in');
         }
         if (!response.ok) {
@@ -245,15 +221,11 @@
         return response.json();
       })
       .then(data => {
-        console.log('Added to cart:', data);
         updateCartDisplay();
       })
       .catch(error => console.error('Error adding to cart:', error));
   }
-  /**
-   * Handles the search functionality.
-   * @param {Event} event - The event object.
-   */
+
   function handleSearch(event) {
     event.preventDefault();
     let searchTerm = document.getElementById('search-input').value;
@@ -261,10 +233,6 @@
     closePopup('search-popup');
   }
 
-  /**
-   * Handles the popup that displayed when clicking on the account icon, this will depend on the log
-   * in status of the user.
-   */
   function handleAccountIconClick() {
     fetch('/api/login-status')
       .then(response => response.json())
@@ -284,9 +252,6 @@
       .catch(error => console.error('Error checking login status:', error));
   }
 
-  /**
-   * Handles the sign out event.
-   */
   function handleSignOut() {
     fetch('/api/logout', {
       method: 'POST',
@@ -301,52 +266,57 @@
         return response.json();
       })
       .then(data => {
-        alert('You have been signed out.');
+        showAlert('You have been signed out.');
         closePopup('account-popup-logged-in');
-        // Optionally reload the page or update UI to reflect signed-out state
         window.location.reload();
       })
       .catch(error => console.error('Error logging out:', error));
   }
 
-  /**
-   * Fetches and displays the order history for a specific user.
-   */
   function fetchOrderHistory() {
     fetch('/api/order-history')
       .then(response => response.json())
       .then(data => {
-        let orderHistoryList = document.getElementById('order-history-list');
-        orderHistoryList.innerHTML = '';
-
-        if (data.length === 0) {
-          let emptyMessage = document.createElement('p');
-          emptyMessage.textContent = 'No order history available.';
-          orderHistoryList.appendChild(emptyMessage);
-        } else {
-          data.forEach(order => {
-            let orderElement = document.createElement('div');
-            orderElement.classList.add('order');
-
-            let orderDetails = document.createElement('p');
-            orderDetails.textContent = `Order Date: ${order.orderDate}, Status: ${order.status}, Total: $${order.totalPrice.toFixed(2)}, Confirmation Code: ${order.confirmationCode}`;
-            orderElement.appendChild(orderDetails);
-
-            let orderItems = document.createElement('ul');
-            order.items.split(', ').forEach(item => {
-              let itemElement = document.createElement('li');
-              itemElement.textContent = item;
-              orderItems.appendChild(itemElement);
-            });
-            orderElement.appendChild(orderItems);
-
-            orderHistoryList.appendChild(orderElement);
-          });
-        }
+        renderOrderHistory(data);
         closePopup('account-popup-logged-in');
         openPopup('order-history-popup');
       })
       .catch(error => console.error('Error fetching order history:', error));
+  }
+
+  function renderOrderHistory(data) {
+    let orderHistoryList = document.getElementById('order-history-list');
+    orderHistoryList.innerHTML = '';
+
+    if (data.length === 0) {
+      let emptyMessage = document.createElement('p');
+      emptyMessage.textContent = 'No order history available.';
+      orderHistoryList.appendChild(emptyMessage);
+    } else {
+      data.forEach(order => {
+        let orderElement = createOrderElement(order);
+        orderHistoryList.appendChild(orderElement);
+      });
+    }
+  }
+
+  function createOrderElement(order) {
+    let orderElement = document.createElement('div');
+    orderElement.classList.add('order');
+
+    let orderDetails = document.createElement('p');
+    orderDetails.textContent = `Order Date: ${order.orderDate}, Status: ${order.status}, Total: $${order.totalPrice.toFixed(2)}, Confirmation Code: ${order.confirmationCode}`;
+    orderElement.appendChild(orderDetails);
+
+    let orderItems = document.createElement('ul');
+    order.items.split(', ').forEach(item => {
+      let itemElement = document.createElement('li');
+      itemElement.textContent = item;
+      orderItems.appendChild(itemElement);
+    });
+    orderElement.appendChild(orderItems);
+
+    return orderElement;
   }
 
   document.getElementById('login-form').addEventListener('submit', handleLogin);
@@ -357,10 +327,6 @@
     openPopup('register-popup');
   });
 
-  /**
-   * Handles the login functionality.
-   * @param {Event} event - The event object.
-   */
   function handleLogin(event) {
     event.preventDefault();
     let username = document.getElementById('username').value;
@@ -383,26 +349,24 @@
       })
       .then(data => {
         if (data.message) {
-          alert(data.message);
+          showAlert(data.message);
           closePopup('account-popup');
         }
       })
-      .catch(error => {
-        if (error.message.includes('Username not found')) {
-          alert('Username not found. Try creating an account.');
-        } else if (error.message.includes('Incorrect password')) {
-          alert('Incorrect password!');
-        } else {
-          console.error('Error logging in:', error);
-          alert('An unexpected error occurred. Please try again.');
-        }
-      });
+      .catch(error => handleLoginError(error));
   }
 
-  /**
-   * Handles the create account or registration functionality.
-   * @param {Event} event - The event object.
-   */
+  function handleLoginError(error) {
+    if (error.message.includes('Username not found')) {
+      showAlert('Username not found. Try creating an account.');
+    } else if (error.message.includes('Incorrect password')) {
+      showAlert('Incorrect password!');
+    } else {
+      console.error('Error logging in:', error);
+      showAlert('An unexpected error occurred. Please try again.');
+    }
+  }
+
   function handleRegister(event) {
     event.preventDefault();
     let username = document.getElementById('new-username').value;
@@ -419,81 +383,85 @@
       .then(response => response.json())
       .then(data => {
         if (data.userId) {
-          alert('Registration successful');
+          showAlert('Registration successful');
           closePopup('register-popup');
         } else {
-          alert('Registration failed...');
+          showAlert('Registration failed...');
         }
       })
       .catch(error => console.error('Error registering:', error));
   }
 
-  /**
-   * Updates the cart and ensures all current cart items are displayed correctly.
-   */
   function updateCartDisplay() {
     fetch('/api/cart')
       .then(response => response.json())
       .then(cartItems => {
-        let cartItemsList = document.getElementById("cart-items");
-        cartItemsList.innerHTML = ""; // Clear existing cart items
-
-        if (!Array.isArray(cartItems) || cartItems.length === 0) {
-          let emptyMessage = document.createElement("li");
-          emptyMessage.textContent = "Your cart is empty.";
-          cartItemsList.appendChild(emptyMessage);
-        } else {
-          cartItems.forEach(item => {
-            let itemElement = document.createElement("li");
-
-            let minusButton = document.createElement("button");
-            minusButton.textContent = "-";
-            minusButton.classList.add("quantity-btn");
-            minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
-
-            let plusButton = document.createElement("button");
-            plusButton.textContent = "+";
-            plusButton.classList.add("quantity-btn");
-            plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
-
-            let quantitySpan = document.createElement("span");
-            quantitySpan.textContent = `${item.quantity}`;
-
-            itemElement.appendChild(minusButton);
-            itemElement.appendChild(quantitySpan);
-            itemElement.appendChild(plusButton);
-            itemElement.appendChild(document.createTextNode(` ${item.name} - $${item.price}`));
-            cartItemsList.appendChild(itemElement);
-          });
-        }
+        renderCartItems(cartItems);
         updateMakeOrderButton();
       })
       .catch(error => console.error("Error fetching cart items", error));
   }
 
-  /**
-   * Clears the cart by removing all the items from it.
-   */
+  function renderCartItems(cartItems) {
+    let cartItemsList = document.getElementById("cart-items");
+    cartItemsList.innerHTML = ""; // Clear existing cart items
+
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+      let emptyMessage = document.createElement("li");
+      emptyMessage.textContent = "Your cart is empty.";
+      cartItemsList.appendChild(emptyMessage);
+    } else {
+      cartItems.forEach(item => {
+        let itemElement = createCartItemElement(item);
+        cartItemsList.appendChild(itemElement);
+      });
+    }
+  }
+
+  function createCartItemElement(item) {
+    let itemElement = document.createElement("li");
+
+    let minusButton = document.createElement("button");
+    minusButton.textContent = "-";
+    minusButton.classList.add("quantity-btn");
+    minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
+
+    let plusButton = document.createElement("button");
+    plusButton.textContent = "+";
+    plusButton.classList.add("quantity-btn");
+    plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
+
+    let quantitySpan = document.createElement("span");
+    quantitySpan.textContent = `${item.quantity}`;
+
+    itemElement.appendChild(minusButton);
+    itemElement.appendChild(quantitySpan);
+    itemElement.appendChild(plusButton);
+    itemElement.appendChild(document.createTextNode(` ${item.name} - $${item.price}`));
+
+    return itemElement;
+  }
+
   function clearCart() {
     fetch('/api/cart', {
       method: 'DELETE'
     })
       .then(response => response.json())
       .then(data => {
-        let cartItemsList = document.getElementById("cart-items");
-        cartItemsList.innerHTML = ""; // Clear existing cart items
-        let emptyMessage = document.createElement("li");
-        emptyMessage.textContent = data.message;
-        cartItemsList.appendChild(emptyMessage);
+        renderEmptyCart(data.message);
         updateMakeOrderButton();
       })
       .catch(error => console.error("Error clearing cart", error));
   }
-  /**
-   * Handles dynamically changing the quantity of a product already in the cart.
-   * @param {number} cartItemId - The ID of the item which quantity is to be changed.
-   * @param {number} newQuantity - The new quantity of the item in the cart.
-   */
+
+  function renderEmptyCart(message) {
+    let cartItemsList = document.getElementById("cart-items");
+    cartItemsList.innerHTML = ""; // Clear existing cart items
+    let emptyMessage = document.createElement("li");
+    emptyMessage.textContent = message;
+    cartItemsList.appendChild(emptyMessage);
+  }
+
   function updateCartItemQuantity(cartItemId, newQuantity) {
     if (newQuantity >= 1) {
       fetch(`/api/cart/${cartItemId}`, {
@@ -515,10 +483,6 @@
     }
   }
 
-  /**
-   * Removes an individual cart item.
-   * @param {number} cartItemId - The ID of the cart item.
-   */
   function removeCartItem(cartItemId) {
     fetch(`/api/cart/${cartItemId}`, {
       method: 'DELETE'
@@ -530,26 +494,16 @@
       .catch(error => console.error('Error removing cart item:', error));
   }
 
-  /**
-   * Ensures that the make order button only works when items are in the cart of a signed in user.
-   */
   function updateMakeOrderButton() {
     fetch('/api/cart')
       .then(response => response.json())
       .then(cartItems => {
         let makeOrderBtn = id('make-order-btn');
-        if (Array.isArray(cartItems) && cartItems.length > 0) {
-          makeOrderBtn.disabled = false;
-        } else {
-          makeOrderBtn.disabled = true;
-        }
+        makeOrderBtn.disabled = !(Array.isArray(cartItems) && cartItems.length > 0);
       })
       .catch(error => console.error("Error fetching cart items", error));
   }
 
-  /**
-   * Open the popup to make an order, with a date and time selection.
-   */
   function openOrderPopup() {
     let popup = document.getElementById('order-popup');
     popup.style.display = 'block';
@@ -563,10 +517,7 @@
     event.preventDefault();
     handleMakeOrder();
   }
-  /**
-   * Handles making an order, uses the api to verify it it can be made, and provides a confirmation
-   * code if it can be made.
-   */
+
   function handleMakeOrder() {
     let pickupDate = document.getElementById('pickup-date').value;
     let pickupTime = document.getElementById('pickup-time').value;
@@ -590,24 +541,16 @@
         return response.json();
       })
       .then(data => {
-        alert('Order placed successfully! Confirmation code: ' + data.confirmationCode);
+        showAlert('Order placed successfully! Confirmation code: ' + data.confirmationCode);
         closePopup('order-popup');
         clearCart();
       })
       .catch(error => {
-        alert('Failed to place order: ' + error.message);
+        showAlert('Failed to place order: ' + error.message);
         console.error('Error making order:', error);
       });
   }
 
-  function handleOrderFormSubmit(event) {
-    event.preventDefault();
-    handleMakeOrder();
-  }
-
-  /**
-   * Creates and displays the popup for the contact us button.
-   */
   function createPopUp() {
     let popup = document.createElement('div');
     popup.id = 'contactPopup';
@@ -649,13 +592,6 @@
     attachPopupEvents(popup);
   }
 
-  /**
-   * Creates a form label element for the popup.
-   * @param {string} forAttribute - The ID belonging
-   * to the form element the label is for.
-   * @param {string} text - The text inside the label.
-   * @returns {HTMLElement} A configured label element.
-   */
   function createFormLabel(forAttribute, text) {
     let label = document.createElement('label');
     label.htmlFor = forAttribute;
@@ -663,12 +599,6 @@
     return label;
   }
 
-  /**
-   * Creates a form element for input.
-   * @param {string} id - The ID to be assigned to the given input.
-   * @param {string} type - The type given to the input element.
-   * @returns {HTMLElement} A configured input element.
-   */
   function createFormInput(id, type) {
     let input = document.createElement('input');
     input.type = type;
@@ -678,11 +608,6 @@
     return input;
   }
 
-  /**
-   * Creates an element for the form inputs.
-   * @param {string} id - The ID to assign to be assinged to the element.
-   * @returns {HTMLElement} A configured text area element.
-   */
   function createFormTextarea(id) {
     let textarea = document.createElement('textarea');
     textarea.id = id;
@@ -691,10 +616,6 @@
     return textarea;
   }
 
-  /**
-   * Attaches event listeners to the popup to allow users to submit and close the form.
-   * @param {HTMLElement} popup - The popup to attach the events to.
-   */
   function attachPopupEvents(popup) {
     let closeBtn = popup.querySelector('.close');
     let contactForm = popup.querySelector('#contactForm');
@@ -732,25 +653,21 @@
         .then(data => {
           if (data.errors) {
             data.errors.forEach(error => {
-              alert(error.msg);
+              showAlert(error.msg);
             });
           } else {
-            alert('Your message has been sent successfully!');
+            showAlert('Your message has been sent successfully!');
             popup.style.display = 'none';
             document.body.removeChild(popup);
           }
         })
         .catch(error => {
           console.error('Error submitting contact form:', error);
-          alert('An error occurred while submitting your message. Please try again later.');
+          showAlert('An error occurred while submitting your message. Please try again later.');
         });
     });
   }
 
-  /**
-   * Opens a popup of the ID specified.
-   * @param {string} popupId - The ID of the popup to open.
-   */
   function openPopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
@@ -758,10 +675,6 @@
     }
   }
 
-  /**
-   * Closes a popup of the ID specified.
-   * @param {string} popupId - The ID of the popup to close.
-   */
   function closePopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
@@ -769,19 +682,10 @@
     }
   }
 
-  /**
-   * Returns the element based on the specified ID.
-   * @param {string} name - The ID of the element.
-   * @returns {HTMLElement} The element with the given ID.
-   */
   function id(name) {
     return document.getElementById(name);
   }
 
-  /**
-   * Toggles view between the grid and list format.
-   * @param {string} view - The type of view ('grid' or 'list').
-   */
   function toggleView(view) {
     let shopContent = document.getElementById('shop-content');
     if (view === 'grid') {
@@ -792,4 +696,40 @@
       shopContent.classList.add('list-view');
     }
   }
+
+  function showAlert(message) {
+    alert(message); // For simplicity, using alert. Replace with better feedback mechanism.
+  }
+
+  const UNAUTHORIZED = 401;
+
+  function initializePopups() {
+    let popups = document.querySelectorAll('.popup');
+    popups.forEach(popup => {
+      let closeBtn = popup.querySelector('.close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          popup.style.display = 'none';
+        });
+      }
+
+      window.addEventListener('click', (event) => {
+        if (event.target === popup) {
+          popup.style.display = 'none';
+        }
+      });
+    });
+
+    let shopNavList = document.getElementById('shop-nav-list');
+    if (shopNavList) {
+      fetchAndRenderProducts('/api/products/Viennoiseries', 'Viennoiseries');
+
+      shopNavList.addEventListener('click', (event) => {
+        event.preventDefault();
+        let category = event.target.getAttribute('data-category');
+        fetchAndRenderProducts(`/api/products/${category}`, category);
+      });
+    }
+  }
+
 })();
