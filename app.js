@@ -27,6 +27,10 @@ app.use(express.urlencoded({extended: true}));
 const SIXTY = 60;
 const TWENTY_FOUR = 24;
 const ONE_THOUSAND = 1000;
+const SERVER_ERROR = 500;
+const LOGIN_ERROR = 401;
+const OK_CODE = 200;
+
 
 app.use(session({
   secret: 'your_secret_key',
@@ -59,14 +63,16 @@ app.post('/api/register', async (req, res) => {
   try {
     let hashedPassword = await bcrypt.hash(password, SALT_VALUE);
     let db = await getDBConnection();
-    let result = await db.run(`INSERT INTO users (username, email, hashedPassword) VALUES (?, ?, ?)`,
-      [username, email, hashedPassword]);
+    let result = await db.run(
+      `INSERT INTO users (username, email, hashedPassword) VALUES (?, ?, ?)`,
+      [username, email, hashedPassword]
+    );
     let userId = result.lastID;
     await db.close();
-    res.status(200).json({message: 'User registered successfully', userId: userId});
+    res.status(OK_CODE).json({message: 'User registered successfully', userId: userId});
   } catch (err) {
     console.error('Error inserting user:', err.message);
-    res.status(500).json({error: 'Failed to register user'});
+    res.status(SERVER_ERROR).json({error: 'Failed to register user'});
   }
 });
 
@@ -79,19 +85,19 @@ app.post('/api/login', async (req, res) => {
     let user = await db.get(`SELECT * FROM users WHERE username = ?`, [username]);
     if (!user) {
       await db.close();
-      return res.status(401).json({error: 'Username not found'});
+      return res.status(LOGIN_ERROR).json({error: 'Username not found'});
     }
     let isMatch = await bcrypt.compare(password, user.hashedPassword);
     if (!isMatch) {
       await db.close();
-      return res.status(401).json({error: 'Incorrect password'});
+      return res.status(LOGIN_ERROR).json({error: 'Incorrect password'});
     }
     req.session.userId = user.userId; // Store userId in session
     await db.close();
-    res.status(200).json({message: 'Login successful'});
+    res.status(OK_CODE).json({message: 'Login successful'});
   } catch (err) {
     console.error('Error during login:', err.message);
-    res.status(500).json({error: 'Failed to login user'});
+    res.status(SERVER_ERROR).json({error: 'Failed to login user'});
   }
 });
 
@@ -105,7 +111,7 @@ app.get('/api/products/:category', async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error('Error retrieving products data:', err.message);
-    res.status(500).send('Error retrieving products data');
+    res.status(SERVER_ERROR).send('Error retrieving products data');
   }
     await db.close();
 });
@@ -116,17 +122,19 @@ app.post('/api/cart', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
 
   if (!userId) {
-    return res.status(401).json({error: 'User not logged in'});
+    return res.status(LOGIN_ERROR).json({error: 'User not logged in'});
   }
 
   try {
     let db = await getDBConnection();
-    await db.run(`INSERT INTO cart (userId, productId, quantity) VALUES (?, ?, ?)`,
-      [userId, productId, quantity]);
+    await db.run(
+      `INSERT INTO cart (userId, productId, quantity) VALUES (?, ?, ?)`,
+      [userId, productId, quantity]
+    );
     await db.close();
     res.json({message: 'Item added to cart', productId: productId});
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
@@ -135,7 +143,7 @@ app.get('/api/cart', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
 
   if (!userId) {
-    return res.status(401).json({error: 'User not logged in'});
+    return res.status(LOGIN_ERROR).json({error: 'User not logged in'});
   }
 
   try {
@@ -147,7 +155,7 @@ app.get('/api/cart', async (req, res) => {
     await db.close();
     res.json(rows || []);
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
@@ -160,7 +168,7 @@ app.get('/api/product/:id', async (req, res) => {
     let row = await db.get('SELECT * FROM products WHERE id = ?', [productId]);
     res.json(row);
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
     await db.close();
 });
@@ -170,16 +178,16 @@ app.delete('/api/cart', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
 
   if (!userId) {
-    return res.status(401).json({error: 'User not logged in'});
+    return res.status(LOGIN_ERROR).json({error: 'User not logged in'});
   }
 
   try {
     let db = await getDBConnection();
     await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
     await db.close();
-    res.status(200).json({message: 'Your cart is empty'});
+    res.status(OK_CODE).json({message: 'Your cart is empty'});
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
@@ -190,12 +198,14 @@ app.put('/api/cart/:id', async (req, res) => {
 
   try {
     let db = await getDBConnection();
-    await db.run(`UPDATE cart SET quantity = ? WHERE cartItemId = ?`,
-      [quantity, cartItemId]);
+    await db.run(
+      `UPDATE cart SET quantity = ? WHERE cartItemId = ?`,
+      [quantity, cartItemId]
+    );
     await db.close();
     res.json({message: 'Cart item quantity updated successfully'});
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
@@ -209,7 +219,7 @@ app.delete('/api/cart/:id', async (req, res) => {
     await db.close();
     res.json({message: 'Cart item removed successfully'});
   } catch (err) {
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
 });
 
@@ -251,13 +261,13 @@ app.post('/api/order', async (req, res) => {
     await db.run(`UPDATE orders SET totalPrice = ? WHERE orderId = ?`, [totalPrice, orderId]);
     await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
 
-    res.status(200).json({message: 'Order placed successfully!', confirmationCode: confirmationCode});
+    res.status(OK_CODE).json({message: 'Order placed successfully!', confirmationCode: confirmationCode});
   } catch (err) {
     console.log(orderId);
     await db.run(`DELETE FROM orderItems WHERE orderId = ?`, [orderId]);
     await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
     console.error('Error placing order:', err.message);
-    res.status(500).json({error: 'Failed to place order'});
+    res.status(SERVER_ERROR).json({error: 'Failed to place order'});
   }
     await db.close();
 });
@@ -272,7 +282,7 @@ app.get('/api/login-status', async (req, res) => {
       res.json({loggedIn: true, username: row.username});
     } catch (err) {
       console.error('Error retrieving user info:', err.message);
-      res.status(500).json({error: err.message});
+      res.status(SERVER_ERROR).json({error: err.message});
     }
       await db.close();
   } else {
@@ -285,7 +295,7 @@ app.get('/api/order-history', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
 
   if (!userId) {
-    return res.status(401).json({error: 'User not logged in'});
+    return res.status(LOGIN_ERROR).json({error: 'User not logged in'});
   }
 
   let db = await getDBConnection();
@@ -304,7 +314,7 @@ app.get('/api/order-history', async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error('Error retrieving order history:', err.message);
-    res.status(500).json({error: err.message});
+    res.status(SERVER_ERROR).json({error: err.message});
   }
     await db.close();
 });
@@ -313,7 +323,7 @@ app.get('/api/order-history', async (req, res) => {
 app.post('/api/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).json({error: 'Failed to log out'});
+      return res.status(SERVER_ERROR).json({error: 'Failed to log out'});
     }
     res.clearCookie('connect.sid');
     res.json({message: 'Logged out successfully'});
@@ -342,13 +352,12 @@ app.post('/api/contact', async (req, res) => {
     res.status(201).json({message: 'Contact message saved successfully'});
   } catch (err) {
     console.error('Error saving contact message:', err.message);
-    res.status(500).json({error: 'Failed to save contact message'});
+    res.status(SERVER_ERROR).json({error: 'Failed to save contact message'});
   }
     await db.close();
 });
 
 // Start the server at the bottom of the file.
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const DFLT_PORT = 3000;
+const PORT = process.env.PORT || DFLT_PORT;
+app.listen(PORT);
