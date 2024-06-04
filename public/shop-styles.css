@@ -527,18 +527,6 @@ form {
   padding-bottom: 25px;
 }
 
-#view-toggle {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-#view-toggle button {
-  margin: -10px 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-}
 
 .list-view .shop-category ul {
   display: flex;
@@ -572,7 +560,10 @@ form {
 }
 
 #list-view-btn, #grid-view-btn {
-  margin-top: -30px;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-left: 30px;
 }
 
 #sign-out-btn {
