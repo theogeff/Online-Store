@@ -761,46 +761,68 @@
   }
 
   /**
-   * Attaches the form submit event to a popup element.
-   * @param {HTMLElement} popup - The popup element.
-   */
-  function attachPopupFormEvent(popup) {
-    let contactForm = popup.querySelector('#contactForm');
-    contactForm.addEventListener('submit', function(event) {
-      event.preventDefault();
+ * Attaches the form submit event to a popup element.
+ * @param {HTMLElement} popup - The popup element.
+ */
+function attachPopupFormEvent(popup) {
+  let contactForm = popup.querySelector('#contactForm');
+  contactForm.addEventListener('submit', handleContactFormSubmit);
+}
 
-      let formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        message: document.getElementById('message').value
-      };
+/**
+ * Handles the submission of the contact form.
+ * @param {Event} event - The event object.
+ */
+function handleContactFormSubmit(event) {
+  event.preventDefault();
 
-      fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.errors) {
-            data.errors.forEach(error => {
-              showAlert(error.msg);
-            });
-          } else {
-            showAlert('Your message has been sent successfully!');
-            popup.style.display = 'none';
-            document.body.removeChild(popup);
-          }
-        })
-        .catch(error => {
-          console.error('Error submitting contact form:', error);
-          showAlert('An error occurred while submitting your message. Please try again later.');
-        });
+  let formData = {
+    firstName: document.getElementById('firstName').value,
+    lastName: document.getElementById('lastName').value,
+    email: document.getElementById('email').value,
+    message: document.getElementById('message').value
+  };
+
+  submitContactForm(formData);
+}
+
+/**
+ * Submits the contact form data to the server.
+ * @param {Object} formData - The data from the contact form.
+ */
+function submitContactForm(formData) {
+  fetch('/api/contact', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(formData)
+  })
+    .then(response => response.json())
+    .then(data => handleContactFormResponse(data))
+    .catch(error => {
+      console.error('Error submitting contact form:', error);
+      showAlert('An error occurred while submitting your message. Please try again later.');
     });
+}
+
+/**
+ * Handles the response from submitting the contact form.
+ * @param {Object} data - The response data from the server.
+ */
+function handleContactFormResponse(data) {
+  if (data.errors) {
+    data.errors.forEach(error => {
+      showAlert(error.msg);
+    });
+  } else {
+    showAlert('Your message has been sent successfully!');
+    let popup = document.getElementById('contactPopup');
+    popup.style.display = 'none';
+    document.body.removeChild(popup);
   }
+}
+
 
   /**
    * Opens a popup by its ID.
