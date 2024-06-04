@@ -491,13 +491,15 @@
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
     minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId,
-      item.quantity - 1));
+      item.quantity - 1)
+    );
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
     plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId,
-      item.quantity + 1));
+      item.quantity + 1)
+    );
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
