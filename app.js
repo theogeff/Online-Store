@@ -232,6 +232,11 @@ app.delete('/api/cart/:id', async (req, res) => {
 // Places an order.
 app.post('/api/order', async (req, res) => {
   let userId = req.session.userId; // Get the userId from the session
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User not logged in' });
+  }
+
   let {pickupTime} = req.body;
 
   // Check if the time is within the allowed range
@@ -263,6 +268,26 @@ app.post('/api/order', async (req, res) => {
   }
   await db.close();
 });
+
+// Searches through products based on a search term.
+app.get('/api/search', async (req, res) => {
+  let searchTerm = `%${req.query.term}%`;
+
+  try {
+    let db = await getDBConnection();
+    let rows = await db.all(`
+      SELECT MIN(id) as id, name, price, availability, category
+      FROM products
+      WHERE name LIKE ? OR price LIKE ? OR category LIKE ? OR availability LIKE ?
+      GROUP BY name, price, availability`, [searchTerm, searchTerm, searchTerm, searchTerm]);
+    await db.close();
+    res.json(rows);
+  } catch (err) {
+    console.error('Error searching products:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 // Verifies the login status of the user.
 app.get('/api/login-status', async (req, res) => {
