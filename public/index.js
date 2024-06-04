@@ -494,20 +494,20 @@
    */
   function updateCartItemQuantity(cartItemId, newQuantity) {
     if (newQuantity >= 1) {
-    fetch(`/api/cart/${cartItemId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        quantity: newQuantity
+      fetch(`/api/cart/${cartItemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          quantity: newQuantity
+        })
       })
-    })
-      .then(response => response.json())
-      .then(data => {
-        updateCartDisplay();
-      })
-      .catch(error => console.error('Error updating cart item quantity:', error));
+        .then(response => response.json())
+        .then(data => {
+          updateCartDisplay();
+        })
+        .catch(error => console.error('Error updating cart item quantity:', error));
     } else {
       removeCartItem(cartItemId);  // Updated to remove item if quantity is less than 1
     }
@@ -579,23 +579,23 @@
         pickupTime: pickupTime
       })
     })
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(data => {
-          throw new Error(data.error);
-        });
-      }
-      return response.json();
-    })
-    .then(data => {
-      alert('Order placed successfully! Confirmation code: ' + data.confirmationCode);
-      closePopup('order-popup');
-      clearCart();
-    })
-    .catch(error => {
-      alert('Failed to place order: ' + error.message);
-      console.error('Error making order:', error);
-    });
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.error);
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert('Order placed successfully! Confirmation code: ' + data.confirmationCode);
+        closePopup('order-popup');
+        clearCart();
+      })
+      .catch(error => {
+        alert('Failed to place order: ' + error.message);
+        console.error('Error making order:', error);
+      });
   }
 
   function handleOrderFormSubmit(event) {
@@ -697,19 +697,19 @@
     let closeBtn = popup.querySelector('.close');
     let contactForm = popup.querySelector('#contactForm');
 
-    closeBtn.addEventListener('click', function() {
+    closeBtn.addEventListener('click', function () {
       popup.style.display = 'none';
       document.body.removeChild(popup);
     });
 
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
       if (event.target === popup) {
         popup.style.display = 'none';
         document.body.removeChild(popup);
       }
     });
 
-    contactForm.addEventListener('submit', function(event) {
+    contactForm.addEventListener('submit', function (event) {
       event.preventDefault();
 
       let formData = {

@@ -22,7 +22,7 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 const SIXTY = 60;
 const TWENTY_FOUR = 24;
@@ -106,9 +106,8 @@ app.get('/api/products/:category', async (req, res) => {
   } catch (err) {
     console.error('Error retrieving products data:', err.message);
     res.status(500).send('Error retrieving products data');
-  } finally {
-    await db.close();
   }
+  await db.close();
 });
 
 // Adds an item to the cart.
@@ -162,9 +161,8 @@ app.get('/api/product/:id', async (req, res) => {
     res.json(row);
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
+  await db.close();
 });
 
 // Clears the cart for the logged-in user.
@@ -260,9 +258,8 @@ app.post('/api/order', async (req, res) => {
     await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
     console.error('Error placing order:', err.message);
     res.status(500).json({ error: 'Failed to place order' });
-  } finally {
-    await db.close();
   }
+  await db.close();
 });
 
 // Verifies the login status of the user.
@@ -276,9 +273,8 @@ app.get('/api/login-status', async (req, res) => {
     } catch (err) {
       console.error('Error retrieving user info:', err.message);
       res.status(500).json({ error: err.message });
-    } finally {
-      await db.close();
     }
+    await db.close();
   } else {
     res.json({ loggedIn: false });
   }
@@ -309,9 +305,8 @@ app.get('/api/order-history', async (req, res) => {
   } catch (err) {
     console.error('Error retrieving order history:', err.message);
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
+  await db.close();
 });
 
 // Logs out the user.
@@ -348,9 +343,8 @@ app.post('/api/contact', async (req, res) => {
   } catch (err) {
     console.error('Error saving contact message:', err.message);
     res.status(500).json({ error: 'Failed to save contact message' });
-  } finally {
-    await db.close();
   }
+  await db.close();
 });
 
 // Start the server at the bottom of the file.
