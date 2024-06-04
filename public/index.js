@@ -10,6 +10,7 @@
     checkLoginStatus();
     setEventListeners();
     initializePopups();
+    searchOrder();
   }
 
   function setEventListeners() {
@@ -22,17 +23,6 @@
         window.location.href = 'index.html';
       });
     }
-
-    let searchIcon = id('search-icon');
-    if (searchIcon) {
-      searchIcon.addEventListener('click', () => {
-        openPopup('search-popup');
-      });
-    }
-
-    let makeOrderBtn = id('make-order-btn');
-    makeOrderBtn.addEventListener('click', openOrderPopup);
-    updateMakeOrderButton();
 
     let accountIcon = id('account-icon');
     if (accountIcon) {
@@ -52,15 +42,28 @@
       clearCartBtn.addEventListener('click', clearCart);
     }
 
-    let searchForm = document.getElementById('search-form');
-    if (searchForm) {
-      searchForm.addEventListener('submit', handleSearch);
-    }
-
     let gridViewBtn = id('grid-view-btn');
     let listViewBtn = id('list-view-btn');
     gridViewBtn.addEventListener('click', () => toggleView('grid'));
     listViewBtn.addEventListener('click', () => toggleView('list'));
+  }
+
+  function searchOrder () {
+    let searchIcon = id('search-icon');
+    if (searchIcon) {
+      searchIcon.addEventListener('click', () => {
+        openPopup('search-popup');
+      });
+    }
+
+    let makeOrderBtn = id('make-order-btn');
+    makeOrderBtn.addEventListener('click', openOrderPopup);
+    updateMakeOrderButton();
+
+    let searchForm = document.getElementById('search-form');
+    if (searchForm) {
+      searchForm.addEventListener('submit', handleSearch);
+    }
   }
 
   /**
@@ -546,7 +549,6 @@
         clearCart();
       })
       .catch(error => {
-        showAlert('Failed to place order: ' + error.message);
         console.error('Error making order:', error);
       });
   }
