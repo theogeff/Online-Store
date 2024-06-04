@@ -348,7 +348,13 @@ app.post('/api/contact', async (req, res) => {
   await db.close();
 });
 
-// Helper Functions
+/**
+ * Processes the user's cart, adding all items to an order and calculating the total price.
+ * @param {object} db - The database object.
+ * @param {number} userId - The ID of the user whose cart is being processed.
+ * @param {number} orderId - The ID of the order being created.
+ * @returns {Promise<void>} A promise that will resolve when the procesing is complete.
+ */
 async function processOrderItems(db, userId, orderId) {
   const cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
                                   FROM cart
@@ -365,6 +371,13 @@ async function processOrderItems(db, userId, orderId) {
   await db.run(`DELETE FROM cart WHERE userId = ?`, [userId]);
 }
 
+/**
+ * Cleans up a failed order by removing all order items and deleting the order.
+ *
+ * @param {object} db - The database connection object.
+ * @param {number} orderId - The ID of the order to be cleaned up.
+ * @returns {Promise<void>} A promise that resolves when the cleanup is complete.
+ */
 async function cleanupFailedOrder(db, orderId) {
   await db.run(`DELETE FROM orderItems WHERE orderId = ?`, [orderId]);
   await db.run(`DELETE FROM orders WHERE orderId = ?`, [orderId]);
