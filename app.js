@@ -35,7 +35,6 @@ const OK_CODE = 200;
 const OPENING_TIME = 8;
 const CLOSING_TIME = 16;
 
-
 app.use(session({
   secret: 'your_secret_key',
   resave: false,
@@ -117,7 +116,7 @@ app.get('/api/products/:category', async (req, res) => {
     console.error('Error retrieving products data:', err.message);
     res.status(SERVER_ERROR).send('Error retrieving products data');
   }
-    await db.close();
+  await db.close();
 });
 
 // Adds an item to the cart.
@@ -152,7 +151,8 @@ app.get('/api/cart', async (req, res) => {
 
   try {
     let db = await getDBConnection();
-    let rows = await db.all(`SELECT cart.cartItemId as cartItemId, products.name, products.price, cart.quantity
+    let rows = await db.all(`SELECT cart.cartItemId as cartItemId, products.name, products.price,
+                            cart.quantity
                              FROM cart
                              JOIN products ON cart.productId = products.id
                              WHERE cart.userId = ?`, [userId]);
@@ -174,7 +174,7 @@ app.get('/api/product/:id', async (req, res) => {
   } catch (err) {
     res.status(SERVER_ERROR).json({error: err.message});
   }
-    await db.close();
+  await db.close();
 });
 
 // Clears the cart for the logged-in user.
@@ -235,7 +235,7 @@ app.post('/api/order', async (req, res) => {
   // Check if the time is within the allowed range
   let [hours, minutes] = pickupTime.split(':').map(Number);
   if (hours < OPENING_TIME || hours > CLOSING_TIME || (hours === CLOSING_TIME && minutes > 0)) {
-    return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM and 4:00 PM.'});
+    return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM-4:00 PM.'});
   }
 
   // Generate a confirmation code
@@ -246,7 +246,8 @@ app.post('/api/order', async (req, res) => {
 
   let orderId;
   try {
-    let result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice, confirmationCode)
+    let result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
+                  confirmationCode)
                   VALUES (?, ?, ?, ?, ?)`, [userId, now, 'Pending', 0, confirmationCode]);
 
     orderId = result.lastID;
@@ -273,7 +274,7 @@ app.post('/api/order', async (req, res) => {
     console.error('Error placing order:', err.message);
     res.status(SERVER_ERROR).json({error: 'Failed to place order'});
   }
-    await db.close();
+  await db.close();
 });
 
 // Verifies the login status of the user.
@@ -288,7 +289,7 @@ app.get('/api/login-status', async (req, res) => {
       console.error('Error retrieving user info:', err.message);
       res.status(SERVER_ERROR).json({error: err.message});
     }
-      await db.close();
+    await db.close();
   } else {
     res.json({loggedIn: false});
   }
@@ -320,7 +321,7 @@ app.get('/api/order-history', async (req, res) => {
     console.error('Error retrieving order history:', err.message);
     res.status(SERVER_ERROR).json({error: err.message});
   }
-    await db.close();
+  await db.close();
 });
 
 // Logs out the user.
@@ -358,7 +359,7 @@ app.post('/api/contact', async (req, res) => {
     console.error('Error saving contact message:', err.message);
     res.status(SERVER_ERROR).json({error: 'Failed to save contact message'});
   }
-    await db.close();
+  await db.close();
 });
 
 // Start the server at the bottom of the file.
