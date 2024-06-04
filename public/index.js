@@ -52,6 +52,7 @@
     gridViewBtn.addEventListener('click', () => toggleView('grid'));
     listViewBtn.addEventListener('click', () => toggleView('list'));
   }
+
   /**
    * Sets up search and ordering functionalities by setting up event listeners.
    */
@@ -140,7 +141,7 @@
    * Creates a product item element.
    * @param {Object} item - The product item object.
    * @returns {HTMLElement} - The created product item element.
-  */
+   */
   function createProductItemElement(item) {
     let itemImage = document.createElement('img');
     itemImage.src = item.imgUrl;
@@ -186,10 +187,11 @@
       newForm.removeEventListener('submit', handler);
     });
   }
+
   /**
-  * Fetches product details for a given product ID.
-  * @param {number} productId - The ID of the product.
-  */
+   * Fetches product details for a given product ID.
+   * @param {number} productId - The ID of the product.
+   */
   function fetchProductDetails(productId) {
     fetch(`/api/product/${productId}`)
       .then(response => response.json())
@@ -203,6 +205,7 @@
       })
       .catch(error => console.error('Error fetching product details:', error));
   }
+
   /**
    * Closes the quantity popup.
    */
@@ -336,10 +339,10 @@
   }
 
   /**
-  * Creates an order element.
+   * Creates an order element.
    * @param {Object} order - The order object.
-  * @returns {HTMLElement} - The created order element.
-  */
+   * @returns {HTMLElement} - The created order element.
+   */
   function createOrderElement(order) {
     let orderElement = document.createElement('div');
     orderElement.classList.add('order');
@@ -401,9 +404,9 @@
   }
 
   /**
-  * Handles login errors.
-  * @param {Error} error - The error object.
-  */
+   * Handles login errors.
+   * @param {Error} error - The error object.
+   */
   function handleLoginError(error) {
     if (error.message.includes('Username not found')) {
       showAlert('Username not found. Try creating an account.');
@@ -416,9 +419,9 @@
   }
 
   /**
-  * Handles the submission of a registration form.
-  * @param {Event} event - The event object.
-  */
+   * Handles the submission of a registration form.
+   * @param {Event} event - The event object.
+   */
   function handleRegister(event) {
     event.preventDefault();
     let username = document.getElementById('new-username').value;
@@ -458,9 +461,9 @@
   }
 
   /**
-  * Displays the cart items on the page.
-  * @param {Array} cartItems - The array of cart item objects.
-  */
+   * Displays the cart items on the page.
+   * @param {Array} cartItems - The array of cart item objects.
+   */
   function renderCartItems(cartItems) {
     let cartItemsList = document.getElementById("cart-items");
     cartItemsList.innerHTML = ""; // Clear existing cart items
@@ -478,10 +481,10 @@
   }
 
   /**
-  * Creates a cart item element.
-  * @param {Object} item - The cart item object.
-  * @returns {HTMLElement} - The created cart item element.
-  */
+   * Creates a cart item element.
+   * @param {Object} item - The cart item object.
+   * @returns {HTMLElement} - The created cart item element.
+   */
   function createCartItemElement(item) {
     let itemElement = document.createElement("li");
 
@@ -536,10 +539,10 @@
   }
 
   /**
-  * Updates the quantity of a cart item.
-  * @param {number} cartItemId - The ID of the cart item.
-  * @param {number} newQuantity - The new quantity of the cart item.
-  */
+   * Updates the quantity of a cart item.
+   * @param {number} cartItemId - The ID of the cart item.
+   * @param {number} newQuantity - The new quantity of the cart item.
+   */
   function updateCartItemQuantity(cartItemId, newQuantity) {
     if (newQuantity >= 1) {
       fetch(`/api/cart/${cartItemId}`, {
@@ -559,9 +562,9 @@
     }
   }
   /**
-  * Removes a cart item.
-  * @param {number} cartItemId - The ID of the cart item to be removed.
-  */
+   * Removes a cart item.
+   * @param {number} cartItemId - The ID of the cart item to be removed.
+   */
   function removeCartItem(cartItemId) {
     fetch(`/api/cart/${cartItemId}`, {
       method: 'DELETE'
@@ -684,11 +687,11 @@
   }
 
   /**
-  * Creates a form label element.
-  * @param {string} forAttribute - The value for the 'for' attribute of the label.
-  * @param {string} text - The text content of the label.
-  * @returns {HTMLElement} - The created label element.
-  */
+   * Creates a form label element.
+   * @param {string} forAttribute - The value for the 'for' attribute of the label.
+   * @param {string} text - The text content of the label.
+   * @returns {HTMLElement} - The created label element.
+   */
   function createFormLabel(forAttribute, text) {
     let label = document.createElement('label');
     label.htmlFor = forAttribute;
@@ -696,11 +699,11 @@
     return label;
   }
   /**
-  * Creates a form input element.
-  * @param {string} id - The ID of the input element.
-  * @param {string} type - The type of the input element.
-  * @returns {HTMLElement} - The created input element.
-  */
+   * Creates a form input element.
+   * @param {string} id - The ID of the input element.
+   * @param {string} type - The type of the input element.
+   * @returns {HTMLElement} - The created input element.
+   */
   function createFormInput(id, type) {
     let input = document.createElement('input');
     input.type = type;
@@ -710,10 +713,10 @@
     return input;
   }
   /**
-  * Creates a form textarea element.
-  * @param {string} id - The ID of the textarea element.
-  * @returns {HTMLElement} - The created textarea element.
-  */
+   * Creates a form textarea element.
+   * @param {string} id - The ID of the textarea element.
+   * @returns {HTMLElement} - The created textarea element.
+   */
   function createFormTextarea(id) {
     let textarea = document.createElement('textarea');
     textarea.id = id;
@@ -722,9 +725,9 @@
     return textarea;
   }
   /**
-  * Attaches events to a popup element.
-  * @param {HTMLElement} popup - The popup element.
-  */
+   * Attaches events to a popup element.
+   * @param {HTMLElement} popup - The popup element.
+   */
   function attachPopupEvents(popup) {
     let closeBtn = popup.querySelector('.close');
     let contactForm = popup.querySelector('#contactForm');
@@ -777,9 +780,9 @@
     });
   }
   /**
-  * Opens a popup by its ID.
-  * @param {string} popupId - The ID of the popup to open.
-  */
+   * Opens a popup by its ID.
+   * @param {string} popupId - The ID of the popup to open.
+   */
   function openPopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
@@ -787,9 +790,9 @@
     }
   }
   /**
-  * Closes a popup by its ID.
-  * @param {string} popupId - The ID of the popup to close.
-  */
+   * Closes a popup by its ID.
+   * @param {string} popupId - The ID of the popup to close.
+   */
   function closePopup(popupId) {
     let popup = document.getElementById(popupId);
     if (popup) {
