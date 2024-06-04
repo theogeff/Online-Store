@@ -141,7 +141,7 @@
         uniqueProductIds.add(item.id);
         console.log('Rendering product:', item); // Add log to check product details
         let itemImage = document.createElement('img');
-        itemImage.src = item.img_url;
+        itemImage.src = item.imgUrl;
         itemImage.alt = item.name;
         itemImage.classList.add('product-image');
         let itemDescription = document.createElement('p');
@@ -185,7 +185,7 @@
         console.log('Fetched product details:', data);
         // Update the popup content with product details
         document.getElementById('popup-product-name').textContent = data.name;
-        document.getElementById('popup-product-img').src = data.img_url;
+        document.getElementById('popup-product-img').src = data.imgUrl;
         document.getElementById('popup-product-price').textContent = `Price: $${data.price}`;
         document.getElementById('popup-product-availability').textContent = `Availability: ${data.availability}`;
         document.getElementById('quantity').value = 1; // Reset quantity to 1
@@ -228,7 +228,7 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        product_id: productId,
+        productId: productId,
         quantity: quantity
       })
     })
@@ -299,7 +299,6 @@
         return response.json();
       })
       .then(data => {
-        console.log(data.message);
         alert('You have been signed out.');
         closePopup('account-popup-logged-in');
         // Optionally reload the page or update UI to reflect signed-out state
@@ -328,7 +327,7 @@
             orderElement.classList.add('order');
 
             let orderDetails = document.createElement('p');
-            orderDetails.textContent = `Order Date: ${order.order_date}, Status: ${order.status}, Total: $${order.total_price.toFixed(2)}, Confirmation Code: ${order.confirmation_code}`;
+            orderDetails.textContent = `Order Date: ${order.orderDate}, Status: ${order.status}, Total: $${order.totalPrice.toFixed(2)}, Confirmation Code: ${order.confirmationCode}`;
             orderElement.appendChild(orderDetails);
 
             let orderItems = document.createElement('ul');
@@ -417,11 +416,10 @@
     })
       .then(response => response.json())
       .then(data => {
-        if (data.user_id) {
+        if (data.userId) {
           alert('Registration successful');
           closePopup('register-popup');
         } else {
-          console.log(data.user_id);
           alert('Registration failed...');
         }
       })
@@ -449,12 +447,12 @@
             let minusButton = document.createElement("button");
             minusButton.textContent = "-";
             minusButton.classList.add("quantity-btn");
-            minusButton.addEventListener('click', () => updateCartItemQuantity(item.cart_item_id, item.quantity - 1));
+            minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
 
             let plusButton = document.createElement("button");
             plusButton.textContent = "+";
             plusButton.classList.add("quantity-btn");
-            plusButton.addEventListener('click', () => updateCartItemQuantity(item.cart_item_id, item.quantity + 1));
+            plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
 
             let quantitySpan = document.createElement("span");
             quantitySpan.textContent = `${item.quantity}`;
@@ -577,8 +575,8 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        pickup_date: pickupDate,
-        pickup_time: pickupTime
+        pickupDate: pickupDate,
+        pickupTime: pickupTime
       })
     })
     .then(response => {
@@ -590,7 +588,7 @@
       return response.json();
     })
     .then(data => {
-      alert('Order placed successfully! Confirmation code: ' + data.confirmation_code);
+      alert('Order placed successfully! Confirmation code: ' + data.confirmationCode);
       closePopup('order-popup');
       clearCart();
     })
