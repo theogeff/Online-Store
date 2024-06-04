@@ -1,7 +1,9 @@
 "use strict";
 
-(function () {
+(function() {
   window.addEventListener("load", init);
+
+  const UNAUTHORIZED = 401;
 
   /**
    * Initializes the page by setting up event listeners and checking on the login status.
@@ -48,7 +50,7 @@
     listViewBtn.addEventListener('click', () => toggleView('list'));
   }
 
-  function searchOrder () {
+  function searchOrder() {
     let searchIcon = id('search-icon');
     if (searchIcon) {
       searchIcon.addEventListener('click', () => {
@@ -182,7 +184,8 @@
         document.getElementById('popup-product-name').textContent = data.name;
         document.getElementById('popup-product-img').src = data.imgUrl;
         document.getElementById('popup-product-price').textContent = `Price: $${data.price}`;
-        document.getElementById('popup-product-availability').textContent = `Availability: ${data.availability}`;
+        document.getElementById('popup-product-availability').textContent = `Availability:
+        ${data.availability}`;
         document.getElementById('quantity').value = 1; // Reset quantity to 1
       })
       .catch(error => console.error('Error fetching product details:', error));
@@ -306,9 +309,9 @@
   function createOrderElement(order) {
     let orderElement = document.createElement('div');
     orderElement.classList.add('order');
-
     let orderDetails = document.createElement('p');
-    orderDetails.textContent = `Order Date: ${order.orderDate}, Status: ${order.status}, Total: $${order.totalPrice.toFixed(2)}, Confirmation Code: ${order.confirmationCode}`;
+    orderDetails.textContent = `Order Date: ${order.orderDate}, Status: ${order.status},
+    Total: $${order.totalPrice.toFixed(2)}, Confirmation Code: ${order.confirmationCode}`;
     orderElement.appendChild(orderDetails);
 
     let orderItems = document.createElement('ul');
@@ -427,12 +430,14 @@
     let minusButton = document.createElement("button");
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
-    minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
+    minusButton.addEventListener('click', () => updateCartItemQuantity
+    (item.cartItemId, item.quantity - 1));
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
-    plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
+    plusButton.addEventListener('click', () => updateCartItemQuantity
+    (item.cartItemId, item.quantity + 1));
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
@@ -482,7 +487,7 @@
         })
         .catch(error => console.error('Error updating cart item quantity:', error));
     } else {
-      removeCartItem(cartItemId);  // Updated to remove item if quantity is less than 1
+      removeCartItem(cartItemId);
     }
   }
 
@@ -703,8 +708,6 @@
     alert(message); // For simplicity, using alert. Replace with better feedback mechanism.
   }
 
-  const UNAUTHORIZED = 401;
-
   function initializePopups() {
     let popups = document.querySelectorAll('.popup');
     popups.forEach(popup => {
@@ -733,5 +736,4 @@
       });
     }
   }
-
 })();
