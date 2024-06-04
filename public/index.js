@@ -4,6 +4,7 @@
   window.addEventListener("load", init);
 
   const UNAUTHORIZED = 401;
+  const ALERT_TIMEOUT = 3000;
 
   /**
    * Initializes the page by setting up event listeners and checking on the login status.
@@ -24,9 +25,7 @@
 
     let logo = document.getElementById('logo');
     if (logo) {
-      logo.addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
+      logo.addEventListener('click', () => { window.location.href = 'index.html'; });
     }
 
     let accountIcon = id('account-icon');
@@ -59,9 +58,7 @@
   function searchOrder() {
     let searchIcon = id('search-icon');
     if (searchIcon) {
-      searchIcon.addEventListener('click', () => {
-        openPopup('search-popup');
-      });
+      searchIcon.addEventListener('click', () => { openPopup('search-popup'); });
     }
 
     let makeOrderBtn = id('make-order-btn');
@@ -102,9 +99,7 @@
   function fetchAndRenderProducts(url, title) {
     fetch(url)
       .then(response => response.json())
-      .then(data => {
-        renderProducts(data, title);
-      })
+      .then(data => { renderProducts(data, title); })
       .catch(error => console.error('Error fetching products:', error));
   }
 
@@ -297,9 +292,9 @@
         }
         return response.json();
       })
-      .then(showAlert('You have been signed out.'))
-      .then(closePopup('account-popup-logged-in'))
-      .then(window.location.reload())
+      .then(() => showAlert('You have been signed out.'))
+      .then(() => closePopup('account-popup-logged-in'))
+      .then(() => window.location.reload())
       .catch(error => console.error('Error logging out:', error));
   }
 
@@ -490,16 +485,12 @@
     let minusButton = document.createElement("button");
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
-    minusButton.addEventListener('click', () =>
-      updateCartItemQuantity(item.cartItemId, item.quantity - 1)
-    );
+    minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
-    plusButton.addEventListener('click', () =>
-      updateCartItemQuantity(item.cartItemId, item.quantity + 1)
-    );
+    plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
@@ -551,9 +542,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          quantity: newQuantity
-        })
+        body: JSON.stringify({ quantity: newQuantity })
       })
         .then(response => response.json())
         .then(updateCartDisplay())
@@ -629,9 +618,7 @@
     })
       .then(response => {
         if (!response.ok) {
-          return response.json().then(data => {
-            throw new Error(data.error);
-          });
+          return response.json().then(data => { throw new Error(data.error); });
         }
         return response.json();
       })
@@ -640,9 +627,7 @@
         closePopup('order-popup');
         clearCart();
       })
-      .catch(error => {
-        console.error('Error making order:', error);
-      });
+      .catch(error => { console.error('Error making order:', error); });
   }
 
   /**
@@ -866,7 +851,7 @@
 
     setTimeout(() => {
       alertContainer.remove();
-    }, 3000); // Adjust the timeout as needed
+    }, ALERT_TIMEOUT); // Adjust the timeout as needed
   }
 
   /**
