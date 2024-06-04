@@ -297,8 +297,7 @@
         }
         return response.json();
       })
-      .then(
-        showAlert('You have been signed out.'))
+      .then(showAlert('You have been signed out.'))
       .then(closePopup('account-popup-logged-in'))
       .then(window.location.reload())
       .catch(error => console.error('Error logging out:', error));
@@ -384,7 +383,7 @@
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({username, password})
     })
       .then(response => {
         if (!response.ok) {
@@ -433,7 +432,7 @@
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username, email, password })
+      body: JSON.stringify({username, email, password})
     })
       .then(response => response.json())
       .then(data => {
@@ -492,13 +491,13 @@
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
     minusButton.addEventListener('click', () =>
-      updateCartItemQuantity(item.cartItemId, item.quantity - 1));
+    updateCartItemQuantity(item.cartItemId, item.quantity - 1));
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
     plusButton.addEventListener('click', () =>
-      updateCartItemQuantity(item.cartItemId, item.quantity + 1));
+    updateCartItemQuantity(item.cartItemId, item.quantity + 1));
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
@@ -528,7 +527,7 @@
 
   /**
    * Displays the empty cart messsage.
-   * @param {T=string} message - The empty cart message.
+   * @param {string} message - The empty cart message.
    */
   function renderEmptyCart(message) {
     let cartItemsList = document.getElementById("cart-items");
@@ -561,6 +560,7 @@
       removeCartItem(cartItemId);
     }
   }
+
   /**
    * Removes a cart item.
    * @param {number} cartItemId - The ID of the cart item to be removed.
@@ -698,6 +698,7 @@
     label.textContent = text;
     return label;
   }
+
   /**
    * Creates a form input element.
    * @param {string} id - The ID of the input element.
@@ -712,6 +713,7 @@
     input.required = true;
     return input;
   }
+
   /**
    * Creates a form textarea element.
    * @param {string} id - The ID of the textarea element.
@@ -724,6 +726,7 @@
     textarea.required = true;
     return textarea;
   }
+
   /**
    * Attaches events to a popup element.
    * @param {HTMLElement} popup - The popup element.
@@ -779,6 +782,7 @@
         });
     });
   }
+
   /**
    * Opens a popup by its ID.
    * @param {string} popupId - The ID of the popup to open.
@@ -789,6 +793,7 @@
       popup.style.display = 'block';
     }
   }
+
   /**
    * Closes a popup by its ID.
    * @param {string} popupId - The ID of the popup to close.
@@ -799,6 +804,7 @@
       popup.style.display = 'none';
     }
   }
+
   /**
    * Gets an element by its ID.
    * @param {string} name - The ID of the element to get.
@@ -830,6 +836,7 @@
   function showAlert(message) {
     alert(message); // For simplicity, using alert. Replace with better feedback mechanism.
   }
+
   /**
    * Initializes popups by setting up event listeners.
    */
