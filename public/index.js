@@ -60,9 +60,8 @@
   function searchOrder() {
     let searchIcon = id('search-icon');
     if (searchIcon) {
-      searchIcon.addEventListener('click', () => { openPopup('search-popup'); });
+      searchIcon.addEventListener('click', () => {openPopup('search-popup');});
     }
-
 
     let makeOrderBtn = id('make-order-btn');
     makeOrderBtn.addEventListener('click', openOrderPopup);
@@ -488,12 +487,16 @@
     let minusButton = document.createElement("button");
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
-    minusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity - 1));
+    minusButton.addEventListener('click', () => {
+      updateCartItemQuantity(item.cartItemId, item.quantity - 1)
+    });
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
-    plusButton.addEventListener('click', () => updateCartItemQuantity(item.cartItemId, item.quantity + 1));
+    plusButton.addEventListener('click', () => {
+      updateCartItemQuantity(item.cartItemId, item.quantity + 1)
+    });
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
