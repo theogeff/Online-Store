@@ -288,7 +288,6 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-
 // Verifies the login status of the user.
 app.get('/api/login-status', async (req, res) => {
   if (req.session.userId) {
