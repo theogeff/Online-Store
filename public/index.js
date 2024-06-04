@@ -25,7 +25,9 @@
 
     let logo = document.getElementById('logo');
     if (logo) {
-      logo.addEventListener('click', () => { window.location.href = 'index.html'; });
+      logo.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
     }
 
     let accountIcon = id('account-icon');
@@ -60,6 +62,7 @@
     if (searchIcon) {
       searchIcon.addEventListener('click', () => { openPopup('search-popup'); });
     }
+
 
     let makeOrderBtn = id('make-order-btn');
     makeOrderBtn.addEventListener('click', openOrderPopup);
@@ -99,7 +102,7 @@
   function fetchAndRenderProducts(url, title) {
     fetch(url)
       .then(response => response.json())
-      .then(data => { renderProducts(data, title); })
+      .then(data => {renderProducts(data, title);})
       .catch(error => console.error('Error fetching products:', error));
   }
 
@@ -542,7 +545,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ quantity: newQuantity })
+        body: JSON.stringify({quantity: newQuantity})
       })
         .then(response => response.json())
         .then(updateCartDisplay())
@@ -618,7 +621,7 @@
     })
       .then(response => {
         if (!response.ok) {
-          return response.json().then(data => { throw new Error(data.error); });
+          return response.json().then(data => {throw new Error(data.error);});
         }
         return response.json();
       })
@@ -627,7 +630,7 @@
         closePopup('order-popup');
         clearCart();
       })
-      .catch(error => { console.error('Error making order:', error); });
+      .catch(error => {console.error('Error making order:', error);});
   }
 
   /**
