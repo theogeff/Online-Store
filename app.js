@@ -230,27 +230,27 @@ app.delete('/api/cart/:id', async (req, res) => {
 
 // Places an order.
 app.post('/api/order', async (req, res) => {
-  const userId = req.session.userId; // Get the userId from the session
-  const {pickupTime} = req.body;
+  let userId = req.session.userId; // Get the userId from the session
+  let {pickupTime} = req.body;
 
   // Check if the time is within the allowed range
-  const [hours, minutes] = pickupTime.split(':').map(Number);
+  let [hours, minutes] = pickupTime.split(':').map(Number);
   if (hours < OPENING_TIME || hours > CLOSING_TIME || (hours === CLOSING_TIME && minutes > 0)) {
     return res.status(BAD_REQUEST).json({error: 'Pickup time must be between 8:00 AM-4:00 PM.'});
   }
 
   // Generate a confirmation code
-  const confirmationCode = crypto.randomBytes(BYTES).toString('hex');
+  let confirmationCode = crypto.randomBytes(BYTES).toString('hex');
 
-  const db = await getDBConnection();
-  const now = new Date().toISOString();
+  let db = await getDBConnection();
+  let now = new Date().toISOString();
 
   try {
-    const result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
+    let result = await db.run(`INSERT INTO orders (userId, orderDate, status, totalPrice,
                   confirmationCode)
                   VALUES (?, ?, ?, ?, ?)`, [userId, now, 'Pending', 0, confirmationCode]);
 
-    const orderId = result.lastID;
+    let orderId = result.lastID;
 
     await processOrderItems(db, userId, orderId);
 
@@ -356,13 +356,13 @@ app.post('/api/contact', async (req, res) => {
  * @returns {Promise<void>} A promise that will resolve when the procesing is complete.
  */
 async function processOrderItems(db, userId, orderId) {
-  const cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
+  let cartItems = await db.all(`SELECT cart.productId, cart.quantity, products.price
                                   FROM cart
                                   JOIN products ON cart.productId = products.id
                                   WHERE cart.userId = ?`, [userId]);
 
   let totalPrice = 0;
-  for (const item of cartItems) {
+  for (let item of cartItems) {
     totalPrice += item.quantity * item.price;
     await db.run(`INSERT INTO orderItems (orderId, productId, quantity, price)
                   VALUES (?, ?, ?, ?)`, [orderId, item.productId, item.quantity, item.price]);

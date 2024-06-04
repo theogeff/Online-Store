@@ -1,6 +1,6 @@
 "use strict";
 
-(function () {
+(function() {
   window.addEventListener("load", init);
 
   /**
@@ -10,7 +10,9 @@
     checkLoginStatus();
     let contactBtn = id('contact-btn');
     contactBtn.addEventListener("click", createPopUp);
-
+    /**
+     * Verifies the login status of the user.
+     */
     function checkLoginStatus() {
       fetch('/api/login-status')
         .then(response => response.json())
