@@ -490,14 +490,14 @@
     let minusButton = document.createElement("button");
     minusButton.textContent = "-";
     minusButton.classList.add("quantity-btn");
-    minusButton.addEventListener('click', () =>
-    updateCartItemQuantity(item.cartItemId, item.quantity - 1));
+    minusButton.addEventListener('click', () => updateCartItemQuantity
+    (item.cartItemId, item.quantity - 1));
 
     let plusButton = document.createElement("button");
     plusButton.textContent = "+";
     plusButton.classList.add("quantity-btn");
-    plusButton.addEventListener('click', () =>
-    updateCartItemQuantity(item.cartItemId, item.quantity + 1));
+    plusButton.addEventListener('click', () => updateCartItemQuantity
+    (item.cartItemId, item.quantity + 1));
 
     let quantitySpan = document.createElement("span");
     quantitySpan.textContent = `${item.quantity}`;
@@ -573,6 +573,7 @@
       .then(updateCartDisplay())
       .catch(error => console.error('Error removing cart item:', error));
   }
+
   /**
    * Updates the state (enabled or disables) of the make order button based on the cart contents.
    */
@@ -735,12 +736,12 @@
     let closeBtn = popup.querySelector('.close');
     let contactForm = popup.querySelector('#contactForm');
 
-    closeBtn.addEventListener('click', function () {
+    closeBtn.addEventListener('click', function() {
       popup.style.display = 'none';
       document.body.removeChild(popup);
     });
 
-    window.addEventListener('click', function (event) {
+    window.addEventListener('click', function(event) {
       if (event.target === popup) {
         popup.style.display = 'none';
         document.body.removeChild(popup);
